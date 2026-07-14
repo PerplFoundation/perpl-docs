@@ -2,7 +2,7 @@
 
 This page is the reference for the core data types you will decode off the wire and the error model you will handle in a client. It covers the primitive type aliases, numeric scaling rules, market IDs, and the full set of enumerations, followed by HTTP (Hypertext Transfer Protocol) status codes, WebSocket close codes, order-reject reasons, and rate limits.
 
-All types are generated from the backend Go structs and shipped as TypeScript interfaces (via `tygo`), so the field names shown below match the wire format byte-for-byte. The full object shapes (`Order`, `Position`, `Wallet`, `Account`, `Market`, …) are documented alongside the endpoints that return them — see [REST API](/broken/pages/ae7aa55bf35629d758b5d2d04960b35978d996f2) and [WebSocket API](/broken/pages/e71e088c834b9b77da57aec97f4819cfcfb4fab6). This page focuses on the shared primitives, scaling, and enums those objects are built from, plus the error model common to both channels.
+All types are generated from the backend Go structs and shipped as TypeScript interfaces (via `tygo`), so the field names shown below match the wire format byte-for-byte. The full object shapes (`Order`, `Position`, `Wallet`, `Account`, `Market`, …) are documented alongside the endpoints that return them — see [REST API](rest.md) and [WebSocket API](websocket.md). This page focuses on the shared primitives, scaling, and enums those objects are built from, plus the error model common to both channels.
 
 ## Primitive types
 
@@ -34,7 +34,7 @@ type Size = number;          // uint64 - Scaled size
 
 ## Numeric scaling
 
-Prices and sizes are transmitted as **scaled integers**. To convert to and from human-readable values, use the per-market decimal counts from [`MarketConfig`](/broken/pages/ae7aa55bf35629d758b5d2d04960b35978d996f2) (`price_decimals`, `size_decimals`). Fees use `Micros` (`10^-6` fractions), margins and other ratios use `Fraction` (hundredths), and leverage is expressed in hundredths.
+Prices and sizes are transmitted as **scaled integers**. To convert to and from human-readable values, use the per-market decimal counts from [`MarketConfig`](rest.md) (`price_decimals`, `size_decimals`). Fees use `Micros` (`10^-6` fractions), margins and other ratios use `Fraction` (hundredths), and leverage is expressed in hundredths.
 
 | Concept           | Type               | Rule                                              |
 | ----------------- | ------------------ | ------------------------------------------------- |
@@ -114,7 +114,7 @@ Market IDs differ per network. Use `GET /api/v1/pub/context` to fetch the live l
 | ZEC    | `50`       | `256`      |
 
 {% hint style="info" %}
-For the full network reference (RPC URLs, chain IDs, contract addresses, collateral token) see [Networks](file:///2362779/getting-started/networks.md).
+For the full network reference (RPC URLs, chain IDs, contract addresses, collateral token) see [Networks](../networks-and-configuration.md).
 {% endhint %}
 
 ## Order enums
@@ -351,7 +351,7 @@ const ScopeAll = ScopeRead | ScopeTrade;     // 3 - full scope
 | `2`          | Trade (implies read) |
 | `3`          | Read + trade         |
 
-See [Authentication](/broken/pages/95f3238273f946046f1da0b3b3d345d40c81ddb4) for how scope is enforced on each channel.
+See [Authentication](authentication.md) for how scope is enforced on each channel.
 
 ## Error model
 
@@ -404,7 +404,7 @@ When an order is rejected or transitions to a terminal state, the `sr` field on 
 | 53   | PerpetualInsolvent            | The perpetual is insolvent                                        |
 
 {% hint style="info" %}
-`sr = 32` (`OrderDescIdTooLow`) means the idempotency key `rq` was not strictly increasing. Seed `rq` from the account's `lfr` (last forwarded request ID) as `rq = max(local, lfr) + 1`. See [WebSocket API](/broken/pages/e71e088c834b9b77da57aec97f4819cfcfb4fab6) for order placement.
+`sr = 32` (`OrderDescIdTooLow`) means the idempotency key `rq` was not strictly increasing. Seed `rq` from the account's `lfr` (last forwarded request ID) as `rq = max(local, lfr) + 1`. See [WebSocket API](websocket.md) for order placement.
 {% endhint %}
 
 ### Rate limits
@@ -433,7 +433,7 @@ async function withBackoff<T>(fn: () => Promise<Response>): Promise<Response> {
 
 ## Related pages
 
-* [REST API](/broken/pages/ae7aa55bf35629d758b5d2d04960b35978d996f2) — endpoints and the full response object shapes.
-* [WebSocket API](/broken/pages/e71e088c834b9b77da57aec97f4819cfcfb4fab6) — message types, streams, and order placement.
-* [Authentication](/broken/pages/95f3238273f946046f1da0b3b3d345d40c81ddb4) — canonical string format and request signing.
-* [Networks](file:///2362779/getting-started/networks.md) — chain IDs, RPC URLs, contract addresses, market IDs.
+* [REST API](rest.md) — endpoints and the full response object shapes.
+* [WebSocket API](websocket.md) — message types, streams, and order placement.
+* [Authentication](authentication.md) — canonical string format and request signing.
+* [Networks](../networks-and-configuration.md) — chain IDs, RPC URLs, contract addresses, market IDs.

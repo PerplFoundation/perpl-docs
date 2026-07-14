@@ -349,6 +349,6 @@ Point the market-making bot's `.env` at the address, RPC URL, and chain ID this 
 
 ## Next steps
 
-* Chain configs, market IDs, and endpoints for every network: [Networks](file:///2362779/getting-started/networks.md).
+* Chain configs, market IDs, and endpoints for every network: [Networks](../networks-and-configuration.md).
 * Generate the full SDK API docs locally: `cargo doc -p perpl-sdk --no-deps --open`.
 * For ad-hoc live inspection without writing code, use the `perpl-cli` tool shipped in the `dex-sdk` repository.

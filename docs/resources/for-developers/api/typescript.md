@@ -8,7 +8,7 @@ Every snippet below is copy-pasteable. Fill in an enrolled API key and a target 
 
 Before writing code, make sure you have:
 
-* **An enrolled API key** — an Ed25519 key pair. The server stores only the public key; the private key never leaves your machine, and every request is signed with it. There is no bearer token or session cookie. Create a key by connecting your wallet in the web UI (mainnet `https://app.perpl.xyz/apikeys`, testnet `https://testnet.perpl.xyz/apikeys`); the UI hands you the `X-API-Key` token and the private key. See [Authentication](file:///2362779/api/authentication.md) for the full model.
+* **An enrolled API key** — an Ed25519 key pair. The server stores only the public key; the private key never leaves your machine, and every request is signed with it. There is no bearer token or session cookie. Create a key by connecting your wallet in the web UI (mainnet `https://app.perpl.xyz/apikeys`, testnet `https://testnet.perpl.xyz/apikeys`); the UI hands you the `X-API-Key` token and the private key. See [Authentication](authentication.md) for the full model.
 * **A key scope that matches your task** — a key carries a scope of `read`, `trade`, or both (`trade` implies `read`). A `read` key can fetch data and subscribe to streams but cannot place orders. **Withdrawals and transfers-out are never permitted via an API key, at any scope.**
 * **An on-chain exchange account** — API authentication is separate from having an account to trade with. Authenticating a key only authorizes API access; trading also requires an on-chain account created with collateral via `createAccount(uint256)` on the Exchange contract. A signed request will succeed at the API layer but some calls return `404` until that account exists.
 
@@ -672,7 +672,7 @@ const hundredthsToLeverage = (h: number) => h / 100;     // 1000 -> 10
 ```
 
 {% hint style="info" %}
-Collateral amounts settle in a 6-decimal token — divide a raw on-chain integer by `1_000_000` for a USD figure. Fees are expressed in `Micros` (10⁻⁶; a negative value is a rebate) and monetary `Amount` fields are decimal strings. See [Networks & Configuration](file:///2362779/getting-started/networks.md).
+Collateral amounts settle in a 6-decimal token — divide a raw on-chain integer by `1_000_000` for a USD figure. Fees are expressed in `Micros` (10⁻⁶; a negative value is a rebate) and monetary `Amount` fields are decimal strings. See [Networks & Configuration](../networks-and-configuration.md).
 {% endhint %}
 
 ## Error handling and rate limits
@@ -769,5 +769,5 @@ Client-to-server frames: 1 Ping, 5 SubscriptionRequest, 22 OrderRequest, 29 ApiK
 
 ## Next steps
 
-* [Authentication](file:///2362779/api/authentication.md) — the full API-key model and request-signing reference.
-* [Networks & Configuration](file:///2362779/getting-started/networks.md) — every endpoint, contract address, and market ID for both networks.
+* [Authentication](authentication.md) — the full API-key model and request-signing reference.
+* [Networks & Configuration](../networks-and-configuration.md) — every endpoint, contract address, and market ID for both networks.

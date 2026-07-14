@@ -266,7 +266,7 @@ The trading endpoint delivers your wallet, order, position, and account data and
 
 ### Authenticating (`mt: 29`)
 
-API keys are Ed25519 (Edwards-curve Digital Signature Algorithm) key pairs. Create one in the web UI (`app.perpl.xyz/apikeys` for mainnet, `testnet.perpl.xyz/apikeys` for testnet) or programmatically (see [Authentication](/broken/pages/95f3238273f946046f1da0b3b3d345d40c81ddb4)). Placing orders requires a `trade`-scoped key — a `read`-scoped key still receives snapshots and updates, but its `OrderRequest` frames are rejected with `403`.
+API keys are Ed25519 (Edwards-curve Digital Signature Algorithm) key pairs. Create one in the web UI (`app.perpl.xyz/apikeys` for mainnet, `testnet.perpl.xyz/apikeys` for testnet) or programmatically (see [Authentication](authentication.md)). Placing orders requires a `trade`-scoped key — a `read`-scoped key still receives snapshots and updates, but its `OrderRequest` frames are rejected with `403`.
 
 Send an `ApiKeySignIn` frame as the **first** message after the socket opens. The Ed25519 signature covers the WS canonical string — four fields joined by `\n` (newline):
 

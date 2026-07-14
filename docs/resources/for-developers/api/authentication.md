@@ -5,7 +5,7 @@ Perpl authenticates programmatic clients — bots, trading terminals, and script
 This page covers how to obtain a key (web UI or programmatic enrollment) and how to sign each REST (Representational State Transfer, i.e. HTTPS) and WebSocket request with it.
 
 {% hint style="info" %}
-The signing scheme includes the network's numeric **chain ID**, so you must sign with the value for the network you are calling. The two live networks are Mainnet (chain ID `143`, default) and Testnet (chain ID `10143`). Full endpoint, contract, and market details are on the [Networks](file:///2362779/getting-started/networks.md) page — reuse those values rather than hard-coding your own.
+The signing scheme includes the network's numeric **chain ID**, so you must sign with the value for the network you are calling. The two live networks are Mainnet (chain ID `143`, default) and Testnet (chain ID `10143`). Full endpoint, contract, and market details are on the [Networks](../networks-and-configuration.md) page — reuse those values rather than hard-coding your own.
 {% endhint %}
 
 | Network           | Chain ID | REST base URL                   | WebSocket URL             |
@@ -50,7 +50,7 @@ Every key carries a **scope**, chosen at enrollment. Scope is stored as a 32-bit
 | **API authentication** | An enrolled API key can call authenticated API endpoints            | Reading order history, position history, connecting to the trading WebSocket |
 | **Exchange account**   | An on-chain account exists on the Exchange contract with collateral | Placing orders, holding positions, trading                                   |
 
-To trade you must additionally create an on-chain account with initial collateral by calling `createAccount(uint256 amountCNS)` on the Exchange contract. Until that account exists, some authenticated calls return **404**. See the [Networks](file:///2362779/getting-started/networks.md) page for the Exchange contract address per network, and the account-creation walkthrough for the `cast` commands.
+To trade you must additionally create an on-chain account with initial collateral by calling `createAccount(uint256 amountCNS)` on the Exchange contract. Until that account exists, some authenticated calls return **404**. See the [Networks](../networks-and-configuration.md) page for the Exchange contract address per network, and the account-creation walkthrough for the `cast` commands.
 
 ## Creating a key
 
@@ -414,6 +414,6 @@ The market-data WebSocket (`/ws/v1/market-data`) requires no authentication — 
 
 ## Next steps
 
-* [Networks](file:///2362779/getting-started/networks.md) — endpoints, chain IDs, contract and collateral addresses, market IDs.
-* [REST Endpoints](/broken/pages/ae7aa55bf35629d758b5d2d04960b35978d996f2) — the full list of HTTP endpoints and which require a signed request.
-* [WebSocket](/broken/pages/e71e088c834b9b77da57aec97f4819cfcfb4fab6) — real-time streams, subscription frames, and order placement over the trading socket.
+* [Networks](../networks-and-configuration.md) — endpoints, chain IDs, contract and collateral addresses, market IDs.
+* [REST Endpoints](rest.md) — the full list of HTTP endpoints and which require a signed request.
+* [WebSocket](websocket.md) — real-time streams, subscription frames, and order placement over the trading socket.

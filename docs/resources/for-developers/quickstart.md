@@ -35,7 +35,7 @@ A key carries a **scope** (`read`, `trade`, or both; `trade` implies `read`). Re
 
 > **Note:** An API key only authorizes API access. Trading also requires an on-chain exchange account (created with initial collateral on the Exchange contract). Until that account exists, some authenticated endpoints return **404**.
 
-Third-party integrations can also enroll keys programmatically with a wallet-signed flow — see [Integrations](file:///2362779/api/authentication.md).
+Third-party integrations can also enroll keys programmatically with a wallet-signed flow — see [Integrations](api/authentication.md).
 {% endstep %}
 
 {% step %}
@@ -154,6 +154,6 @@ console.log(res.status, await res.json());
 
 ## Next steps
 
-* **Place an order.** Orders are submitted over the trading WebSocket (`/ws/v1/trading`): authenticate with a signed `ApiKeySignIn` frame, then send `OrderRequest` frames. See [Placing orders over WebSocket](file:///2362779/api/websocket.md).
-* **Use the SDK.** For a higher-level Rust client that tracks exchange state and builds orders for you, see the [SDK Quickstart](file:///2362779/sdk/quickstart.md).
-* **Explore the endpoints.** Browse the full [REST API reference](file:///2362779/api/rest.md) and [WebSocket reference](file:///2362779/api/websocket.md).
+* **Place an order.** Orders are submitted over the trading WebSocket (`/ws/v1/trading`): authenticate with a signed `ApiKeySignIn` frame, then send `OrderRequest` frames. See [Placing orders over WebSocket](api/websocket.md).
+* **Use the SDK.** For a higher-level Rust client that tracks exchange state and builds orders for you, see the [SDK Quickstart](sdk/quickstart.md).
+* **Explore the endpoints.** Browse the full [REST API reference](api/rest.md) and [WebSocket reference](api/websocket.md).

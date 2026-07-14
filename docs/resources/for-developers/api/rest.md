@@ -1,6 +1,6 @@
 # REST
 
-The Perpl REST (Representational State Transfer) API is served over HTTPS and covers public market data, account and trading history, and API-key enrollment. Streaming data (order books, live prices, order/position updates, order placement) is handled by the [WebSocket API](/broken/pages/e71e088c834b9b77da57aec97f4819cfcfb4fab6), not REST.
+The Perpl REST (Representational State Transfer) API is served over HTTPS and covers public market data, account and trading history, and API-key enrollment. Streaming data (order books, live prices, order/position updates, order placement) is handled by the [WebSocket API](websocket.md), not REST.
 
 All response types are generated from Go structs and shipped as TypeScript interfaces (via `tygo`), so the field names shown below match the wire format exactly.
 
@@ -21,7 +21,7 @@ export PERPL_API_URL="https://app.perpl.xyz/api"    # mainnet
 ```
 
 {% hint style="info" %}
-Market IDs differ per network. Mainnet: BTC=1, MON=10, ETH=20, SOL=31, HYPE=40, ZEC=50. Testnet: BTC=16, ETH=32, SOL=48, MON=64, ZEC=256. For the full list of network values (RPC URLs, contract addresses, collateral token) see [Networks](file:///2362779/getting-started/networks.md).
+Market IDs differ per network. Mainnet: BTC=1, MON=10, ETH=20, SOL=31, HYPE=40, ZEC=50. Testnet: BTC=16, ETH=32, SOL=48, MON=64, ZEC=256. For the full list of network values (RPC URLs, contract addresses, collateral token) see [Networks](../networks-and-configuration.md).
 {% endhint %}
 
 ## Authentication overview
@@ -47,7 +47,7 @@ A key also carries a **scope** (`read`, `trade`, or both). REST history and prof
 Enrolling an API key only authorizes API access — it does not create an exchange account. Trading additionally requires an on-chain account created via `createAccount(uint256 amountCNS)` on the Exchange contract. Endpoints that need an on-chain account may return `404` if none exists.
 {% endhint %}
 
-For the full canonical-string format and a signing helper, see [Authentication](/broken/pages/95f3238273f946046f1da0b3b3d345d40c81ddb4). To obtain a key, see [Authentication → Creating a key](/broken/pages/95f3238273f946046f1da0b3b3d345d40c81ddb4#creating-a-key).
+For the full canonical-string format and a signing helper, see [Authentication](authentication.md). To obtain a key, see [Authentication → Creating a key](authentication.md#creating-a-key).
 
 ***
 
@@ -70,7 +70,7 @@ interface Context {
 }
 ```
 
-Each `ProtocolInstance` carries operational limits such as `min_account_open_amount`, `min_deposit_amount`, `min_withdraw_amount`, and `max_account_trigger_orders`. Each `Market` carries `price_decimals` and `size_decimals`, which you use to scale integer prices and sizes into human-readable values (see [Types](/broken/pages/ddd73ec926cff4ce86a45002c3091dc0c9a5e2e1)).
+Each `ProtocolInstance` carries operational limits such as `min_account_open_amount`, `min_deposit_amount`, `min_withdraw_amount`, and `max_account_trigger_orders`. Each `Market` carries `price_decimals` and `size_decimals`, which you use to scale integer prices and sizes into human-readable values (see [Types](types-and-errors.md)).
 
 **Example**:
 
@@ -169,7 +169,7 @@ curl "${PERPL_API_URL:-https://app.perpl.xyz/api}/v1/profile/announcements"
 
 Enrollment is a one-time, wallet-authorized flow that turns a locally generated Ed25519 key pair into an `X-API-Key` token. Both endpoints below are authorized by a **wallet signature**, not an API-key signature, and are CORS (cross-origin resource sharing) enabled — the request `Origin` must be pre-whitelisted by Perpl.
 
-For the full step-by-step flow (keypair generation, EIP-712 signing, proof-of-possession), see [Authentication → Programmatic enrollment](/broken/pages/95f3238273f946046f1da0b3b3d345d40c81ddb4#programmatic-enrollment).
+For the full step-by-step flow (keypair generation, EIP-712 signing, proof-of-possession), see [Authentication → Programmatic enrollment](authentication.md#programmatic-enrollment).
 
 ### POST /api/v1/api-key/payload
 
@@ -226,7 +226,7 @@ interface RefCode {
 
 Returns `404` with an empty `code` if no referral code is assigned.
 
-**Example** (`$SIG`, `$TS`, `$NONCE` are the signed values — see [Authentication](/broken/pages/95f3238273f946046f1da0b3b3d345d40c81ddb4)):
+**Example** (`$SIG`, `$TS`, `$NONCE` are the signed values — see [Authentication](authentication.md)):
 
 ```bash
 curl "${PERPL_API_URL:-https://app.perpl.xyz/api}/v1/profile/ref-code" \
@@ -354,7 +354,7 @@ interface OrderHistoryPage {
 }
 ```
 
-See [Types](/broken/pages/ddd73ec926cff4ce86a45002c3091dc0c9a5e2e1) for the `Order` structure.
+See [Types](types-and-errors.md) for the `Order` structure.
 
 ***
 
@@ -373,13 +373,13 @@ interface PositionHistoryPage {
 }
 ```
 
-See [Types](/broken/pages/ddd73ec926cff4ce86a45002c3091dc0c9a5e2e1) for the `Position` structure.
+See [Types](types-and-errors.md) for the `Position` structure.
 
 ***
 
 ## Pagination example
 
-Each request is signed with the API-key headers. `signedRequest(method, target, body)` is the helper defined in [Authentication](/broken/pages/95f3238273f946046f1da0b3b3d345d40c81ddb4#signing-rest-requests) — note that the `request-target` (path + query string) must be signed exactly as sent.
+Each request is signed with the API-key headers. `signedRequest(method, target, body)` is the helper defined in [Authentication](authentication.md#signing-rest-requests) — note that the `request-target` (path + query string) must be signed exactly as sent.
 
 ```typescript
 async function fetchAllFills() {

@@ -64,7 +64,7 @@ To trade you must hold an on-chain **exchange account**, created by depositing c
 | Mainnet | `0x34B6552d57a35a1D042CcAe1951BD1C370112a6F` | `https://rpc.monad.xyz`         |
 | Testnet | `0x1964C32f0bE608E7D29302AFF5E61268E72080cc` | `https://testnet-rpc.monad.xyz` |
 
-The full network reference lives in [Networks](/broken/pages/578e643acac394165f467403906e8e6dc793c4b9).
+The full network reference lives in [Networks](networks-and-configuration.md).
 
 ## Two ways to integrate
 

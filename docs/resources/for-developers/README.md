@@ -10,27 +10,27 @@ hidden: true
 
     ## Where to start
 
-    * **New here?** Read the [Overview](/broken/pages/5a69bedb232b70c4989807b6d23e551d74daf663) to understand what Perpl offers, then follow the [Quickstart](/broken/pages/af6a6296f2f90f7eed97308765cd82bd5bca5f31) to make your first call.
-    * **Connecting an app?** Set up [Networks & Configuration](/broken/pages/11482366d3a6409305f1d7d00b36f17997c923bd) for the environment you target (mainnet, testnet, or solonet).
+    * **New here?** Read the [Overview](overview.md) to understand what Perpl offers, then follow the [Quickstart](quickstart.md) to make your first call.
+    * **Connecting an app?** Set up [Networks & Configuration](networks-and-configuration.md) for the environment you target (mainnet, testnet, or solonet).
 
     ## Main sections
 
-    ### [Getting Started](/broken/pages/5a69bedb232b70c4989807b6d23e551d74daf663)
+    ### [Getting Started](overview.md)
 
     Orientation, network/environment configuration, and a hands-on quickstart.
 
-    ### [API Guide](/broken/pages/9dd5a484fe8fc217f74a531796d424138fb73ff7)
+    ### [API Guide](api/authentication.md)
 
-    The HTTP and streaming surface: [Authentication](/broken/pages/9dd5a484fe8fc217f74a531796d424138fb73ff7), the [REST API](/broken/pages/81bef8fbf6300ac6ec7bd9f8e6c207c4f0869ddf), the [WebSocket API](/broken/pages/223abca72fc7209783a4ad6eb9ff8c6e0fade083), and shared [Types & Errors](/broken/pages/f3d5373018598765d9da98c708aefe0053551c2b).
+    The HTTP and streaming surface: [Authentication](api/authentication.md), the [REST API](api/rest.md), the [WebSocket API](api/websocket.md), and shared [Types & Errors](api/types-and-errors.md).
 
-    ### [SDK Guide](/broken/pages/78347328cda017e6ec44bf9ea030bc7724c5f5f1)
+    ### [SDK Guide](sdk/install.md)
 
-    The recommended path for most integrations: [Install the SDK](/broken/pages/78347328cda017e6ec44bf9ea030bc7724c5f5f1), core [Concepts](/broken/pages/2771b2d599f49e7ea4cea4aa5d579dfc156838d8), a [Quickstart](/broken/pages/2728f4fb2ba87de568d060053578aa6ed534d0b4), the [perpl-cli](/broken/pages/9ff2e48d312669c35602fb701ed0246611f71474) debugging tool, and runnable [Examples](/broken/pages/e05699b1d4b8a38ff62792fd5705e786c7de5211).
+    The recommended path for most integrations: [Install the SDK](sdk/install.md), core [Concepts](sdk/concepts.md), a [Quickstart](sdk/quickstart.md), the [perpl-cli](sdk/perpl-cli.md) debugging tool, and runnable [Examples](sdk/examples.md).
 
-    ### [Direct API](/broken/pages/0d8d0b9313f6c5cf05a23e1a3ca1bc579a521ec4)
+    ### [Direct API](api/typescript.md)
 
-    Talk to the exchange without the SDK, from [TypeScript](/broken/pages/0d8d0b9313f6c5cf05a23e1a3ca1bc579a521ec4) or [Python](/broken/pages/6133f73290ac777aaaa705f1e125749db5c9832f).
+    Talk to the exchange without the SDK, from [TypeScript](api/typescript.md) or [Python](api/python.md).
 
-    ### [Recipes](/broken/pages/453a19f2609ba2238eece352c015d18c20b6b9cd)
+    ### [Recipes](recipes.md)
 
     Task-oriented, copy-pasteable solutions to common integration problems.

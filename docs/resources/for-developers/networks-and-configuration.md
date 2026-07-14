@@ -197,8 +197,8 @@ let chain = Chain::custom(
 
 Choosing a network only tells your client _where_ to connect. It does not authenticate you, and it does not create an exchange account. Those are separate steps covered elsewhere in the docs:
 
-* **API authentication** — sign requests with an enrolled API key (an Ed25519 key pair). See [Authentication](file:///2362779/api/authentication.md).
-* **Exchange account** — an on-chain account created with collateral by calling `createAccount(uint256)` on the Exchange contract. See [Authentication](file:///2362779/api/authentication.md).
+* **API authentication** — sign requests with an enrolled API key (an Ed25519 key pair). See [Authentication](api/authentication.md).
+* **Exchange account** — an on-chain account created with collateral by calling `createAccount(uint256)` on the Exchange contract. See [Authentication](api/authentication.md).
 
 {% hint style="info" %}
 A successful signed API request does **not** mean you have an exchange account. Some calls return `404` until an on-chain account exists for your wallet.
