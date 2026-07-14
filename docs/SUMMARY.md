@@ -16,12 +16,14 @@
 * [Referrals](exchange/referrals.md)
 * [Points](exchange/points.md)
 * [mPoints](exchange/mpoints.md)
-* [Tournament](exchange/tournament.md)
+* [Tournaments](exchange/tournaments/README.md)
+  * [Tournament #1](exchange/tournaments/tournament.md)
+  * [Tournament #2](exchange/tournaments/tournament-1.md)
 * [Rescue UI](exchange/rescue-ui.md)
-* [Vaults: PLP](exchange/vaults-plp.md)
 * [Security](exchange/security/README.md)
   * [🛣️ Limiting Open Interest](exchange/security/limiting-open-interest.md)
   * [🏧 Withdrawal Limits](exchange/security/withdrawal-limits.md)
+* [Vaults: PLP](exchange/vaults-plp.md)
 
 ## Onboarding
 
