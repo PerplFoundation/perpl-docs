@@ -17,7 +17,7 @@
 * [Points](exchange/points.md)
 * [mPoints](exchange/mpoints.md)
 * [Tournaments](exchange/tournaments/README.md)
-  * [Tournament #2](exchange/tournaments/tournament.md)
+  * [Tournament #2](exchange/tournaments/tournament-2.md)
   * [Tournament #1](exchange/tournaments/tournament-1.md)
 * [Rescue UI](exchange/rescue-ui.md)
 * [Security](exchange/security/README.md)
