@@ -1,78 +1,108 @@
-# Tournament
+# Tournament #2
 
-_This tournament ended on **July 1, 17:00 UTC 2026.** There will be more tournaments in the future._
+### $100K Monad Cards Invitational
 
-***
+A four-week trading tournament, with three leaderboards.
 
+$100,000 on the line.
 
+Bonus prize: Monad Cards Invitational Badge SBT NFT for everyone who participates.
 
-Welcome to the 1st Perpl Mainnet Trading Tournament. For two weeks, traders can compete across two independent leaderboards for **$50,000** in cash prizes.
+The competition runs from **16 July, 15:00 UTC to 13 August, 15:00 UTC**.
 
-Every market is eligible.
+### Who's Invited
 
-The competition runs from **June 17, 17:00 UTC** to **July 1, 17:00 UTC**.
+The Invitational is gated to two groups:
 
-### **Two Ways to Win** <a href="#id-565f7a17-f614-4685-9956-131ea3eb2362" id="id-565f7a17-f614-4685-9956-131ea3eb2362"></a>
+* **Monad Cards NFT holders**
+* **Perpl Points holders above a certain threshold**
 
-The competition runs on two leaderboards that score independently. A trader can rank on one, the other, or both.
+The exact Perpl Points threshold will be announced after the Week 5 Perpl Points snapshot.
 
-### **ROI Contest - $25,000** <a href="#f61a6c92-e2e1-4425-9867-c72525576fc1" id="f61a6c92-e2e1-4425-9867-c72525576fc1"></a>
+If you are invited, all you need to do to participate is put in 1 trade.Your wallet will automatically appear on the leaderboard, and you will qualify for the SBT Badge.
 
-Ranks traders by percentage return on capital, including both realized and unrealized gains, over the time period of the tournament, across all positions. Calculated as:
+{% embed url="https://x.com/monad/status/2077019610956624241?s=20" %}
 
-`ROI = PNL across all markets / (starting amount + deposits)`
+### Three Leaderboards, Three Ways to Win
 
-| **Place** | **Cash Prize** | **Other Prizes**     |
-| --------- | -------------- | -------------------- |
-| 1         | $10,000        | Perpl Summer VIP box |
-| 2         | $5,000         | Perpl Summer VIP box |
-| 3         | $3,000         | Perpl Summer VIP box |
-| 4         | $2,000         |                      |
-| 5         | $1,500         |                      |
-| 6         | $1,000         |                      |
-| 7         | $800           |                      |
-| 8         | $700           |                      |
-| 9         | $600           |                      |
-| 10        | $400           |                      |
-| **Total** | **$25,000**    |                      |
+The competition runs on three independent leaderboards. All traders compete for all three. Every market is eligible.
 
+### PNL - $50,000
 
+Ranks traders by total profit and loss (unrealized and realized), across all positions over the tournament period.
 
-### **Volume Contest - $25,000** <a href="#bb048e2e-c394-4ec8-a3d6-9e4fec93ca4c" id="bb048e2e-c394-4ec8-a3d6-9e4fec93ca4c"></a>
+This is the absolute dollar amount won/lost (not percentage-based).
+
+Highest positive PNL wins.
+
+| **Place** | **Cash Prize** | **Other Prizes** |
+| --------- | -------------- | ---------------- |
+| 1         | $30,000        | Perpl VIP box    |
+| 2         | $15,000        | Perpl VIP box    |
+| 3         | $5,000         | Perpl VIP box    |
+| 5         | $1,500         |                  |
+| 6         | $1,000         |                  |
+| 7         | $800           |                  |
+| 8         | $700           |                  |
+| 9         | $600           |                  |
+| 10        | $400           |                  |
+| **Total** | **$25,000**    |                  |
+
+### ROI Contest - $35,000
+
+Ranks traders by percentage return on capital, including both realized and unrealized gains, over the tournament period across all positions.Calculated as:
+
+> ROI = PNL across all markets / (starting equity + deposits)
+
+Rules:
+
+* min deposit: $200
+* min volume: $200k
+
+| **Place** | **Cash Prize** | **Other Prizes** |
+| --------- | -------------- | ---------------- |
+| 1         | $10,000        | Perpl VIP box    |
+| 2         | $7,000         | Perpl VIP box    |
+| 3         | $5,000         | Perpl VIP box    |
+| 4         | $3,000         |                  |
+| 5         | $2,500         |                  |
+| 6         | $2,000         |                  |
+| 7         | $1,750         |                  |
+| 8         | $1,500         |                  |
+| 9         | $1,250         |                  |
+| 10        | $1,000         |                  |
+| **Total** | **$50,000**    |                  |
+
+### Volume Contest - $15,000
 
 Ranks traders by total notional volume traded. Maker and taker volume count equally.
 
-| **Place** | **Cash Prize** | **Other Prizes**     |
-| --------- | -------------- | -------------------- |
-| 1         | $7,000         | Perpl Summer VIP box |
-| 2         | $4,200         | Perpl Summer VIP box |
-| 3         | $3,000         | Perpl Summer VIP box |
-| 4         | $2,500         |                      |
-| 5         | $2,000         |                      |
-| 6         | $1,750         |                      |
-| 7         | $1,500         |                      |
-| 8         | $1,250         |                      |
-| 9         | $1,000         |                      |
-| 10        | $800           |                      |
-| **Total** | **$25,000**    |                      |
+| **Place** | **Cash Prize** | **Other Prizes** |
+| --------- | -------------- | ---------------- |
+| 1         | $3,800         | Perpl VIP box    |
+| 2         | $2,500         | Perpl VIP box    |
+| 3         | $2,000         | Perpl VIP box    |
+| 4         | $1,500         |                  |
+| 5         | $1,200         |                  |
+| 6         | $1,000         |                  |
+| 7         | $900           |                  |
+| 8         | $800           |                  |
+| 9         | $700           |                  |
+| 10        | $600           |                  |
+| **Total** | **$15,000**    |                  |
 
-#### Settlement
+### Monad Cards Invitational Badge
 
-Both leaderboards pay out the top 10 traders in cash.
+Every trader who participates will receive the Monad Cards Invitational Badge. A soulbound NFT.To be eligible for the badge you need at least one trade.The badge is permanent proof that you were here for the First Monad Cards Invitational Tournament.
+
+### Settlement
 
 Payouts will be sent directly to the winners' accounts within 7 days of the leaderboards being finalized.
 
-#### How to Participate
+### Rules
 
-Everyone who uses Perpl while the tournament is running automatically participates.
+Perpl reserves the right to disqualify accounts at its discretion if an award recipient fails AML/KYC check performed by Perpl or if market manipulation practice is detected.
 
-#### Minimum Requirements
+Wash trading, self-dealing and volume generated between coordinated wallets are not allowed and may result in disqualification from a Perpl leaderboard.
 
-* A deposit of $100&#x20;
-* $100,000 in trading volume during the 2-week duration of the tournament.
-
-#### Rules
-
-Perpl reserves the right to disqualify accounts at its discretion where manipulation is detected.
-
-Wash trading and volume generated between coordinated wallets are not allowed and may result in disqualification from both leaderboards.
+Institutional market makers are not eligible for participation in the tournament.
