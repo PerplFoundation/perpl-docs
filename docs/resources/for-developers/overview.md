@@ -4,8 +4,8 @@ Perpl is an **isolated-margin perpetual-futures decentralized exchange (DEX)** t
 
 This page introduces the core concepts you need before you write any code, then walks through the two ways to integrate with Perpl:
 
-* [**Direct REST + WebSocket API**](overview.md#path-a-rest--websocket-api) — call the HTTP and WebSocket endpoints from any language.
-* [**Rust SDK**](overview.md#path-b-rust-sdk) — use the `perpl-sdk` crate and the `perpl-cli` command-line tool.
+* [**Direct REST + WebSocket API**](#two-ways-to-integrate) — call the HTTP and WebSocket endpoints from any language.
+* [**Rust SDK**](#two-ways-to-integrate) — use the `perpl-sdk` crate and the `perpl-cli` command-line tool.
 
 ## Isolated margin
 
