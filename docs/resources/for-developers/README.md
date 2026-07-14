@@ -1,7 +1,3 @@
----
-hidden: true
----
-
 # 🖥️ For Developers
 
 *   Welcome to the developer documentation for **Perpl**, a perpetual futures exchange built on Monad.
