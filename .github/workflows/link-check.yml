@@ -1,0 +1,35 @@
+name: Link Check
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '.github/workflows/link-check.yml'
+      - '.lycheeignore'
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'   # weekly (Mon 06:00 UTC) — catch links that rot upstream
+
+permissions:
+  contents: read
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run lychee link checker
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # Check every Markdown file under docs/. Fails the job on any broken
+          # internal (relative .md) or external (http/https) link, and on the
+          # migration artifacts we want to keep out: broken:// and file:// URIs.
+          args: >-
+            --no-progress
+            --include-fragments
+            --scheme https --scheme http --scheme file
+            'docs/**/*.md'
+          fail: true
+          failIfEmpty: true

@@ -1,0 +1,6 @@
+# URLs that are healthy but reject CI crawlers or require auth (not doc breakage).
+# Lines are regex matched against the full URL.
+^https://ka-p\.fontawesome\.com
+^https://.*\.gitbook\.io
+^https://api\.gitbook\.com
+^https://static-.*\.gitbook\.com
