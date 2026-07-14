@@ -14,14 +14,12 @@ The competition runs from **16 July, 15:00 UTC to 13 August, 15:00 UTC**.
 
 The Invitational is gated to two groups:
 
-* **Monad Cards NFT holders**
+* [**Monad Cards NFT holders**](https://cards.monad.xyz/)
 * **Perpl Points holders above a certain threshold**
 
 The exact Perpl Points threshold will be announced after the Week 5 Perpl Points snapshot.
 
 If you are invited, all you need to do to participate is put in 1 trade.Your wallet will automatically appear on the leaderboard, and you will qualify for the SBT Badge.
-
-{% embed url="https://x.com/monad/status/2077019610956624241?s=20" %}
 
 ### Three Leaderboards, Three Ways to Win
 
