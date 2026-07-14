@@ -30,7 +30,7 @@ In short: `Change` is more gas-efficient (one book modification instead of a del
 
 ## Using `Change`
 
-A `Change` is an order operation that carries the **existing order ID** (`oid`) plus the fields you want to amend. In the WebSocket/REST API it is `OrderType` value **`7`**; the SDK/on-chain `RequestType` enum is 0-indexed, so the same operation is value **`6`** when you build it for `execOrders`. See [Types & Errors](/broken/pages/f3d5373018598765d9da98c708aefe0053551c2b) for the full order-type and flag tables, and [REST API](/broken/pages/81bef8fbf6300ac6ec7bd9f8e6c207c4f0869ddf) / [WebSocket API](/broken/pages/223abca72fc7209783a4ad6eb9ff8c6e0fade083) for the request shapes.
+A `Change` is an order operation that carries the **existing order ID** (`oid`) plus the fields you want to amend. In the WebSocket/REST API it is `OrderType` value **`7`**; the SDK/on-chain `RequestType` enum is 0-indexed, so the same operation is value **`6`** when you build it for `execOrders`. See [Types & Errors](api/types-and-errors.md) for the full order-type and flag tables, and [REST API](api/rest.md) / [WebSocket API](api/websocket.md) for the request shapes.
 
 A single `Change` can amend any of:
 
@@ -59,8 +59,8 @@ If you genuinely must cancel and replace (e.g., changing an order's side), put t
 * **`PostOnly` flag** — set the `PostOnly` flag (`1`) so an order that would cross the book is rejected instead of executing as a taker. This guarantees you pay maker, never taker, fees.
 * **`IoC` / `FOK`** — use `ImmediateOrCancel` (`4`) or fill-or-kill semantics when you deliberately want to take, e.g. hedging.
 * **Manage expiries by block** (the `lb` last-execution-block field) rather than cancelling — let stale quotes lapse, or refresh them with a `Change`.
-* **Use `rq` (request ID) as a client order ID** and track the response sequence numbers for reliable, idempotent requoting — see the reliability guidance in [WebSocket API](/broken/pages/223abca72fc7209783a4ad6eb9ff8c6e0fade083).
-* **Use the SDK's in-memory state cache** (`SnapshotBuilder` + `stream`) instead of polling — it keeps a live view of your orders and the book so you can compute the next `Change` locally without extra reads. See [SDK Concepts](/broken/pages/2771b2d599f49e7ea4cea4aa5d579dfc156838d8).
+* **Use `rq` (request ID) as a client order ID** and track the response sequence numbers for reliable, idempotent requoting — see the reliability guidance in [WebSocket API](api/websocket.md).
+* **Use the SDK's in-memory state cache** (`SnapshotBuilder` + `stream`) instead of polling — it keeps a live view of your orders and the book so you can compute the next `Change` locally without extra reads. See [SDK Concepts](sdk/concepts.md).
 
 ## Measuring yourself: the Change-to-Place ratio
 

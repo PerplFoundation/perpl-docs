@@ -4,8 +4,8 @@ Perpl is an **isolated-margin perpetual-futures decentralized exchange (DEX)** t
 
 This page introduces the core concepts you need before you write any code, then walks through the two ways to integrate with Perpl:
 
-* [**Direct REST + WebSocket API**](overview.md#path-a-rest--websocket-api) — call the HTTP and WebSocket endpoints from any language.
-* [**Rust SDK**](overview.md#path-b-rust-sdk) — use the `perpl-sdk` crate and the `perpl-cli` command-line tool.
+* [**Direct REST + WebSocket API**](#two-ways-to-integrate) — call the HTTP and WebSocket endpoints from any language.
+* [**Rust SDK**](#two-ways-to-integrate) — use the `perpl-sdk` crate and the `perpl-cli` command-line tool.
 
 ## Isolated margin
 
@@ -64,7 +64,7 @@ To trade you must hold an on-chain **exchange account**, created by depositing c
 | Mainnet | `0x34B6552d57a35a1D042CcAe1951BD1C370112a6F` | `https://rpc.monad.xyz`         |
 | Testnet | `0x1964C32f0bE608E7D29302AFF5E61268E72080cc` | `https://testnet-rpc.monad.xyz` |
 
-The full network reference lives in [Networks](/broken/pages/578e643acac394165f467403906e8e6dc793c4b9).
+The full network reference lives in [Networks](networks-and-configuration.md).
 
 ## Two ways to integrate
 

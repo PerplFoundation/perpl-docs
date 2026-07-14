@@ -4,7 +4,7 @@ Copy-pasteable, task-oriented snippets for the most common Perpl integration job
 
 Each recipe shows the direct-API approach first (REST over HTTPS and the WebSocket streams) and then notes the equivalent in the Rust SDK (software development kit, the `perpl-sdk` crate) where one exists. Acronyms used throughout: **REST** (Representational State Transfer), **WSS** (WebSocket Secure), **API** (application programming interface), **RPC** (remote procedure call), **IOC** (immediate-or-cancel), **FOK** (fill-or-kill), **GTC** (good-till-cancel), **bps** (basis points), **PnL** (profit and loss), **FIFO** (first-in-first-out).
 
-> **Note:** These recipes assume you have already created an API key and set your environment variables. If not, start with the [Quickstart](/broken/pages/af6a6296f2f90f7eed97308765cd82bd5bca5f31) and the [Networks & Configuration](/broken/pages/11482366d3a6409305f1d7d00b36f17997c923bd) reference.
+> **Note:** These recipes assume you have already created an API key and set your environment variables. If not, start with the [Quickstart](quickstart.md) and the [Networks & Configuration](networks-and-configuration.md) reference.
 
 ***
 
@@ -67,7 +67,7 @@ async function signedFetch(method: string, target: string, body = '') {
 ```
 
 {% hint style="info" %}
-The `request-target` must match **byte-for-byte** what the server receives — include the query string exactly as sent, and sign that exact string. The timestamp must be within **±30 seconds** of server time, and each `nonce` is single-use. See [Authentication](/broken/pages/9dd5a484fe8fc217f74a531796d424138fb73ff7) for the full signing spec.
+The `request-target` must match **byte-for-byte** what the server receives — include the query string exactly as sent, and sign that exact string. The timestamp must be within **±30 seconds** of server time, and each `nonce` is single-use. See [Authentication](api/authentication.md) for the full signing spec.
 {% endhint %}
 
 ### Opening the trading WebSocket
@@ -133,10 +133,10 @@ function openTradingSocket(onMessage: (msg: any) => void) {
 ```
 
 {% hint style="info" %}
-On close code **3401** (authentication failure), reconnect and re-send a freshly signed `mt: 29` frame (new timestamp + nonce). Full connection, snapshot, sequence-tracking, and reconnection semantics are in the [WebSocket reference](/broken/pages/223abca72fc7209783a4ad6eb9ff8c6e0fade083).
+On close code **3401** (authentication failure), reconnect and re-send a freshly signed `mt: 29` frame (new timestamp + nonce). Full connection, snapshot, sequence-tracking, and reconnection semantics are in the [WebSocket reference](api/websocket.md).
 {% endhint %}
 
-**SDK equivalent.** The Rust SDK does not use the WebSocket API. It maintains an in-memory cache of on-chain exchange state: build a snapshot with `state::SnapshotBuilder`, then keep it current from a per-block event stream (`stream::raw`) fed into `Exchange::apply_events`. See [SDK Concepts](/broken/pages/2771b2d599f49e7ea4cea4aa5d579dfc156838d8).
+**SDK equivalent.** The Rust SDK does not use the WebSocket API. It maintains an in-memory cache of on-chain exchange state: build a snapshot with `state::SnapshotBuilder`, then keep it current from a per-block event stream (`stream::raw`) fed into `Exchange::apply_events`. See [SDK Concepts](sdk/concepts.md).
 
 ***
 
@@ -269,7 +269,7 @@ let receipt = instance
     .send().await?.get_receipt().await?;
 ```
 
-The SDK works in human-readable leverage (not hundredths) and scales prices/sizes via the perpetual's converters. Note the order-type numbering differs between the two layers: the WebSocket API's `t` field is **1-indexed** (`1` OpenLong … `7` Change, as in the table above), while the SDK's `RequestType` enum is **0-indexed** (`0` OpenLong … `6` Change) — the same operation, offset by one. See [SDK Concepts → Building and sending orders](/broken/pages/2771b2d599f49e7ea4cea4aa5d579dfc156838d8#building-and-sending-orders).
+The SDK works in human-readable leverage (not hundredths) and scales prices/sizes via the perpetual's converters. Note the order-type numbering differs between the two layers: the WebSocket API's `t` field is **1-indexed** (`1` OpenLong … `7` Change, as in the table above), while the SDK's `RequestType` enum is **0-indexed** (`0` OpenLong … `6` Change) — the same operation, offset by one. See [SDK Concepts → Building and sending orders](sdk/concepts.md#building-and-sending-orders).
 
 ***
 
@@ -313,10 +313,10 @@ async function getAllFills() {
 ```
 
 {% hint style="info" %}
-The history endpoints do not support server-side filtering by market or date — filter client-side. See the [REST API reference](/broken/pages/81bef8fbf6300ac6ec7bd9f8e6c207c4f0869ddf).
+The history endpoints do not support server-side filtering by market or date — filter client-side. See the [REST API reference](api/rest.md).
 {% endhint %}
 
-**SDK equivalent.** Layer the normalized trade stream `stream::trade` on top of `stream::raw`. It aggregates all maker fills belonging to one taker into a single `Trade` and normalizes the fixed-point values to decimals. Each `Trade` exposes `taker_account_id`, `taker_side`, `total_size()`, `avg_price()`, `perpetual_id`, `taker_fee`, and `maker_fills` (each with `maker_account_id`, `maker_order_id`, `size`, `price`, `fee`). See [SDK Concepts → the normalized trade stream](/broken/pages/2771b2d599f49e7ea4cea4aa5d579dfc156838d8#optional--the-normalized-trade-stream-streamtrade).
+**SDK equivalent.** Layer the normalized trade stream `stream::trade` on top of `stream::raw`. It aggregates all maker fills belonging to one taker into a single `Trade` and normalizes the fixed-point values to decimals. Each `Trade` exposes `taker_account_id`, `taker_side`, `total_size()`, `avg_price()`, `perpetual_id`, `taker_fee`, and `maker_fills` (each with `maker_account_id`, `maker_order_id`, `size`, `price`, `fee`). See [SDK Concepts → the normalized trade stream](sdk/concepts.md#optional--the-normalized-trade-stream-streamtrade).
 
 ***
 
@@ -351,7 +351,7 @@ const { ws } = openTradingSocket((msg) => {
 For **historical** positions and account events, use the signed REST endpoints `GET /api/v1/trading/position-history` and `GET /api/v1/trading/account-history` (same `{ d, np }` paginated shape as fills). Account events are typed by `et` (AccountEventType), e.g. `1` Deposit, `2` Withdrawal, `4` Settlement, `5` Liquidation, `8` Funding. Balances and amounts are decimal strings; fees are in micros (`10^-6`).
 
 {% hint style="info" %}
-There is no REST endpoint for _current_ positions — the live view is the WebSocket PositionsSnapshot/PositionsUpdate stream. REST `position-history` returns historical position records. The `Position` and `Account` type fields are documented in [Types & Errors](/broken/pages/f3d5373018598765d9da98c708aefe0053551c2b).
+There is no REST endpoint for _current_ positions — the live view is the WebSocket PositionsSnapshot/PositionsUpdate stream. REST `position-history` returns historical position records. The `Position` and `Account` type fields are documented in [Types & Errors](api/types-and-errors.md).
 {% endhint %}
 
 **SDK equivalent.** Snapshot the accounts you care about and read state directly off the cache:
@@ -362,7 +362,7 @@ let exchange = SnapshotBuilder::new(&chain, provider.clone())
     .build().await?;
 ```
 
-`.with_accounts(...)` fetches the accounts' balances and positions; alternatively `.with_all_positions()` fetches every position (the two are mutually exclusive). See [SDK Concepts → the snapshot workflow](/broken/pages/2771b2d599f49e7ea4cea4aa5d579dfc156838d8#the-snapshot-then-stream-workflow).
+`.with_accounts(...)` fetches the accounts' balances and positions; alternatively `.with_all_positions()` fetches every position (the two are mutually exclusive). See [SDK Concepts → the snapshot workflow](sdk/concepts.md#the-snapshot-then-stream-workflow).
 
 ***
 
@@ -413,7 +413,7 @@ book.connect();
 ```
 
 {% hint style="info" %}
-Prices and sizes are scaled by the market's `price_decimals` / `size_decimals` (from `GET /api/v1/pub/context`). Other market-data streams use the same `mt: 5` subscribe shape: `trades@<market_id>`, `candles@<market_id>*<resolution>`, `market-state@<chain_id>`, `funding@<chain_id>`, `gas-stats@<chain_id>`, and `heartbeat@<chain_id>`. See the [WebSocket reference](/broken/pages/223abca72fc7209783a4ad6eb9ff8c6e0fade083).
+Prices and sizes are scaled by the market's `price_decimals` / `size_decimals` (from `GET /api/v1/pub/context`). Other market-data streams use the same `mt: 5` subscribe shape: `trades@<market_id>`, `candles@<market_id>*<resolution>`, `market-state@<chain_id>`, `funding@<chain_id>`, `gas-stats@<chain_id>`, and `heartbeat@<chain_id>`. See the [WebSocket reference](api/websocket.md).
 {% endhint %}
 
 **SDK equivalent.** The SDK maintains a full **L3** (level 3, per-order) book: snapshot a perpetual, stream events, and read `perp.l3_book()` alongside `perp.mark_price()`, `perp.last_price()`, and `perp.oracle_price()`:
@@ -435,7 +435,7 @@ while let Some(block) = raw.next().await {
 }
 ```
 
-The command-line tool prints the same book without writing code: `perpl-cli show book --perp <id>`. See [SDK Concepts](/broken/pages/2771b2d599f49e7ea4cea4aa5d579dfc156838d8) and the [CLI reference](/broken/pages/9ff2e48d312669c35602fb701ed0246611f71474).
+The command-line tool prints the same book without writing code: `perpl-cli show book --perp <id>`. See [SDK Concepts](sdk/concepts.md) and the [CLI reference](sdk/perpl-cli.md).
 
 ***
 
@@ -503,7 +503,7 @@ function takeProfitLong(marketId: number, positionId: number, sizeScaled: number
 For a **short** position, mirror the logic with `CloseShort` (`t: 4`): the stop-loss fires on a GTE condition (price rising against you) and the take-profit on an LTE condition (price falling in your favor).
 
 {% hint style="info" %}
-The number of resting trigger orders per account is capped by `max_account_trigger_orders` from the `ProtocolInstance` in `GET /api/v1/pub/context`. Trigger-order lifecycle, the `tr` request-linking behavior, and order-status transitions (`8` Untriggered → `9` Triggered) are described in the [WebSocket reference](/broken/pages/223abca72fc7209783a4ad6eb9ff8c6e0fade083).
+The number of resting trigger orders per account is capped by `max_account_trigger_orders` from the `ProtocolInstance` in `GET /api/v1/pub/context`. Trigger-order lifecycle, the `tr` request-linking behavior, and order-status transitions (`8` Untriggered → `9` Triggered) are described in the [WebSocket reference](api/websocket.md).
 {% endhint %}
 
 **SDK equivalent.** Not documented. The `OrderRequest::new` constructor in the current SDK sources exposes order-lifecycle fields (price, size, expiry, post-only / FOK / IOC, leverage, collateral amount) but **no** trigger-price / trigger-condition / linked-position fields, so trigger orders are placed over the WebSocket API shown above.
@@ -518,18 +518,18 @@ The number of resting trigger orders per account is capped by `max_account_trigg
 * **WebSocket auth failure** — close code `3401`; reconnect and re-send a freshly signed `mt: 29` frame.
 * **Rate limits** — approximate: REST public \~100 req/min, REST authenticated \~60 req/min, WS \~50 msg/sec per connection, \~5 connections per IP. On HTTP `429`, back off exponentially (1s / 2s / 4s).
 
-Full reconnection and error-handling patterns are in the [WebSocket reference](/broken/pages/223abca72fc7209783a4ad6eb9ff8c6e0fade083) and [Types & Errors](/broken/pages/f3d5373018598765d9da98c708aefe0053551c2b).
+Full reconnection and error-handling patterns are in the [WebSocket reference](api/websocket.md) and [Types & Errors](api/types-and-errors.md).
 
 ***
 
 ## See also
 
-* [Quickstart](/broken/pages/af6a6296f2f90f7eed97308765cd82bd5bca5f31) — create a key and make your first signed call.
-* [Networks & Configuration](/broken/pages/11482366d3a6409305f1d7d00b36f17997c923bd) — endpoints, addresses, market IDs.
-* [Authentication](/broken/pages/9dd5a484fe8fc217f74a531796d424138fb73ff7) — REST and WebSocket signing spec.
-* [REST API reference](/broken/pages/81bef8fbf6300ac6ec7bd9f8e6c207c4f0869ddf) — every endpoint, pagination, response shapes.
-* [WebSocket reference](/broken/pages/223abca72fc7209783a4ad6eb9ff8c6e0fade083) — message types, streams, order semantics.
-* [Types & Errors](/broken/pages/f3d5373018598765d9da98c708aefe0053551c2b) — enums, `Position` / `Account` fields, reject reasons.
-* [SDK Concepts](/broken/pages/2771b2d599f49e7ea4cea4aa5d579dfc156838d8) — the Rust `perpl-sdk` snapshot/stream/order model.
+* [Quickstart](quickstart.md) — create a key and make your first signed call.
+* [Networks & Configuration](networks-and-configuration.md) — endpoints, addresses, market IDs.
+* [Authentication](api/authentication.md) — REST and WebSocket signing spec.
+* [REST API reference](api/rest.md) — every endpoint, pagination, response shapes.
+* [WebSocket reference](api/websocket.md) — message types, streams, order semantics.
+* [Types & Errors](api/types-and-errors.md) — enums, `Position` / `Account` fields, reject reasons.
+* [SDK Concepts](sdk/concepts.md) — the Rust `perpl-sdk` snapshot/stream/order model.
 
 > **TODO(author):** Confirm the final GitBook navigation slugs for the cross-links above once the site structure is published (the API pages may live under a `direct-api/` section rather than `api/`); adjust the relative paths to match.

@@ -28,7 +28,7 @@ You also need an **enrolled API key**. Create one in the web UI (connect your wa
 
 ## Configuration
 
-The examples read the network and key material from environment variables, matching the reference clients. Full endpoint, contract, and market values for both networks are on the [Networks](file:///2362779/getting-started/networks.md) page — reuse those rather than hard-coding your own.
+The examples read the network and key material from environment variables, matching the reference clients. Full endpoint, contract, and market values for both networks are on the [Networks](../networks-and-configuration.md) page — reuse those rather than hard-coding your own.
 
 | Variable               | Meaning                                         | Mainnet default             |
 | ---------------------- | ----------------------------------------------- | --------------------------- |
@@ -633,7 +633,7 @@ Key facts for the flow:
 
 ## Next steps
 
-* [Networks & Configuration](file:///2362779/getting-started/networks.md) — every endpoint, contract address, chain ID, and market ID for both networks.
-* [REST API](file:///2362779/api/rest.md) — full endpoint reference and response types.
-* [WebSocket API](file:///2362779/api/websocket.md) — all message types, streams, and trading-flow semantics.
-* [Authentication](file:///2362779/api/authentication.md) — the signing scheme in full, including scopes and validity rules.
+* [Networks & Configuration](../networks-and-configuration.md) — every endpoint, contract address, chain ID, and market ID for both networks.
+* [REST API](rest.md) — full endpoint reference and response types.
+* [WebSocket API](websocket.md) — all message types, streams, and trading-flow semantics.
+* [Authentication](authentication.md) — the signing scheme in full, including scopes and validity rules.

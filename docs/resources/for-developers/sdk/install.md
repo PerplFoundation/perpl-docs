@@ -131,10 +131,10 @@ fn main() {
 }
 ```
 
-For the full per-network reference (RPC URLs, contract and collateral-token addresses, market IDs), see [Networks & Configuration](file:///2362779/getting-started/networks.md).
+For the full per-network reference (RPC URLs, contract and collateral-token addresses, market IDs), see [Networks & Configuration](../networks-and-configuration.md).
 
 ## Next steps
 
-* **Read exchange state.** Build a snapshot and keep it current from the event stream — see the [SDK Quickstart](/broken/pages/fa98ed8f00683553133d4226d3f9b39bd0235fc3).
-* **Use the CLI.** The workspace also ships `perpl-cli`, a command-line tool (CLI) for reading and tracing exchange state and events — see the [CLI reference](/broken/pages/5268aa41b0d895ff11b9b51dcbc6fc179e54aadb).
+* **Read exchange state.** Build a snapshot and keep it current from the event stream — see the [SDK Quickstart](quickstart.md).
+* **Use the CLI.** The workspace also ships `perpl-cli`, a command-line tool (CLI) for reading and tracing exchange state and events — see the [CLI reference](perpl-cli.md).
 * **Browse examples.** Working market-making and utility bots live in [`dex-sdk-examples`](https://github.com/PerplFoundation/dex-sdk-examples).
