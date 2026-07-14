@@ -19,7 +19,9 @@ The Invitational is gated to two groups:
 
 The exact Perpl Points threshold will be announced after the Week 5 Perpl Points snapshot.
 
-If you are invited, all you need to do to participate is put in 1 trade.Your wallet will automatically appear on the leaderboard, and you will qualify for the SBT Badge.
+If you are invited, all you need to do to participate is put in 1 trade.
+
+Your wallet will automatically appear on the leaderboard, and you will qualify for the SBT Badge.
 
 ### Three Leaderboards, Three Ways to Win
 
