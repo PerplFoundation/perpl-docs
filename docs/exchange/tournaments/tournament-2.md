@@ -44,14 +44,16 @@ Highest positive PNL wins.
 
 ### ROI Contest - $35,000
 
-Ranks traders by percentage return on capital, including both realized and unrealized gains, over the tournament period across all positions.Calculated as:
+Ranks traders by percentage return on capital, including both realized and unrealized gains, over the tournament period across all positions.
+
+Calculated as:
 
 > ROI = PNL across all markets / (starting equity + deposits)
 
 Rules:
 
-* min deposit: $200
-* min volume: $200k
+* minimum deposit: $200
+* minimum volume: $200k
 
 | **Place** | **Cash Prize** | **Other Prizes** |
 | --------- | -------------- | ---------------- |
@@ -87,7 +89,11 @@ Ranks traders by total notional volume traded. Maker and taker volume count equa
 
 ### Monad Cards Invitational Badge
 
-Every trader who participates will receive the Monad Cards Invitational Badge. A soulbound NFT.To be eligible for the badge you need at least one trade.The badge is permanent proof that you were here for the First Monad Cards Invitational Tournament.
+Every trader who participates will receive the Monad Cards Invitational Badge. A soulbound NFT.
+
+To be eligible for the badge you need at least one trade.
+
+The badge is permanent proof that you were here for the First Monad Cards Invitational Tournament.
 
 ### Settlement
 
