@@ -2,7 +2,7 @@
 
 ### $100K Monad Cards Invitational
 
-A four-week trading tournament, with three leaderboards.
+An invite-only, four-week trading tournament, with two leaderboards.
 
 $100,000 on the line.
 
@@ -23,51 +23,28 @@ If you are invited, all you need to do to participate is put in 1 trade.
 
 Your wallet will automatically appear on the leaderboard, and you will qualify for the SBT Badge.
 
-### Three Leaderboards, Three Ways to Win
+### Two Leaderboards, Three Ways to Win
 
-The competition runs on three independent leaderboards. All traders compete for all three. Every market is eligible.
+The competition runs on two independent leaderboards. All traders compete for both. Every market is eligible.
 
-### PNL - $50,000
+### Trading Contest - $85,000
 
-Ranks traders by total profit and loss (unrealized and realized), across all positions over the tournament period.
-
-This is the absolute dollar amount won/lost (not percentage-based).
-
-Highest positive PNL wins.
-
-| **Place** | **Cash Prize** | **Other Prizes** |
-| --------- | -------------- | ---------------- |
-| 1         | $30,000        | Perpl VIP box    |
-| 2         | $15,000        | Perpl VIP box    |
-| 3         | $5,000         | Perpl VIP box    |
-| **Total** | **$50,000**    |                  |
-
-### ROI Contest - $35,000
-
-Ranks traders by percentage return on capital, including both realized and unrealized gains, over the tournament period across all positions.
+Ranks traders by a trading score that combines profit and volume, across all positions over the tournament period. PNL includes both realized and unrealized.
 
 Calculated as:
 
-> ROI = PNL across all markets / (starting equity + deposits)
-
-Rules:
-
-* minimum deposit: $200
-* minimum volume: $200k
+> Score = PNL × √Volume
 
 | **Place** | **Cash Prize** | **Other Prizes** |
 | --------- | -------------- | ---------------- |
-| 1         | $10,000        | Perpl VIP box    |
-| 2         | $7,000         | Perpl VIP box    |
-| 3         | $5,000         | Perpl VIP box    |
-| 4         | $3,000         |                  |
-| 5         | $2,500         |                  |
-| 6         | $2,000         |                  |
-| 7         | $1,750         |                  |
-| 8         | $1,500         |                  |
-| 9         | $1,250         |                  |
-| 10        | $1,000         |                  |
-| **Total** | **$35,000**    |                  |
+| 1         | $25,000        | Perpl VIP box    |
+| 2         | $15,000        | Perpl VIP box    |
+| 3         | $10,000        | Perpl VIP box    |
+| 4         | $7,500         | Perpl VIP box    |
+| 5         | $5,000         | Perpl VIP box    |
+| 6–10      | $2,500 each    |                  |
+| 11–20     | $1,000 each    |                  |
+| **Total** | **$85,000**    |                  |
 
 ### Volume Contest - $15,000
 
@@ -106,3 +83,5 @@ Perpl reserves the right to disqualify accounts at its discretion if an award re
 Wash trading, self-dealing and volume generated between coordinated wallets are not allowed and may result in disqualification from a Perpl leaderboard.
 
 Institutional market makers are not eligible for participation in the tournament.
+
+A minimum of $250k volume is required to be eligible for a prize.
