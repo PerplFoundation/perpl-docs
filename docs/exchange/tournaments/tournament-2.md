@@ -23,7 +23,7 @@ If you are invited, all you need to do to participate is put in 1 trade.
 
 Your wallet will automatically appear on the leaderboard, and you will qualify for the SBT Badge.
 
-### Two Leaderboards, Three Ways to Win
+### Two Leaderboards, Two Ways to Win
 
 The competition runs on two independent leaderboards. All traders compete for both. Every market is eligible.
 
