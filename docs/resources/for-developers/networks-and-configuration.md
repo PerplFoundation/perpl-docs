@@ -100,7 +100,11 @@ function usdToRaw(usd: number): bigint {
 ```
 
 {% hint style="info" %}
-The minimum deposit to open an exchange account is returned by the public API as a raw integer (for example `min_account_open_amount: 100000000`, which is `100.0` AUSD). Always read the current minimum from `GET /api/v1/pub/context` or `getAccountCreationInfo()` rather than hard-coding it.
+The minimum deposit to open an exchange account is returned by the public API as a raw integer. On **mainnet** it is `min_account_open_amount: 10000000` (`10.0` AUSD); on **testnet** it is `100000000` (`100.0` AUSD). Always read the current minimum from `GET /api/v1/pub/context` or `getAccountCreationInfo()` rather than hard-coding it.
+{% endhint %}
+
+{% hint style="info" %}
+**Minimum order value.** Separately from the one-unit size floor (see [Minimum Orders](../../exchange/minimum-orders.md)), the exchange can enforce a minimum dollar value per order — one for resting orders (`getMinimumPostCNS`) and one for immediately-filled orders (`getMinimumSettleCNS`), both returned in 6-decimal AUSD. **Both are `0` today** (no restriction) and are owner-adjustable in the range $0–$163.83. A full-position close is always exempt. Read them live from the Exchange contract rather than hard-coding.
 {% endhint %}
 
 ## Markets
