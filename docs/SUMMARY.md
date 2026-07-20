@@ -12,6 +12,7 @@
 * [Funding](exchange/funding.md)
 * [Price Indices](exchange/price-indices.md)
 * [Order Types](exchange/order-types.md)
+* [Minimum Orders](exchange/minimum-orders.md)
 * [Fees](exchange/fees.md)
 * [Referrals](exchange/referrals.md)
 * [Points](exchange/points.md)

@@ -23,6 +23,7 @@ Perpl supports the following order types:
 * **Max Matches**: Caps the number of book matches per operation, helping control gas costs for large orders.
 * **Threshold Price**: Maximum slippage protection, up to 65,535 bps from the reference price.
 * **Expiry Block**: Time-in-force expressed as a block number. Expired orders can be cleared by anyone (with a recycle-fee incentive enabled when configured).
+* **Minimum Size**: Every order must be for at least one size unit of the market (for example 0.00001 BTC, 0.001 ETH, 1 MON). There is no dollar minimum to place an order today, and closing your entire position is always allowed. See [Minimum Orders](minimum-orders.md).
 
 {% hint style="info" %}
 **Change Orders**: Resting limit orders on the book can be modified in-place (price, size, or expiry) using a single Change operation. This reuses the existing order's storage slot, saving approximately 15,000 gas compared to canceling and re-placing an order.

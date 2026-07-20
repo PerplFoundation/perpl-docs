@@ -21,4 +21,6 @@ Placing your first trade is easy:
 7. Example: 10x leverage X $100 collateral = $1,000 position size
 8. Place Your Order: Click Place Order, then confirm in the pop-up.&#x20;
 
+There’s no dollar minimum to open a trade — the only floor is one size unit of the market (for example 0.00001 BTC), worth well under a few dollars — and you can always close your entire position, however small. See [Minimum Orders](../exchange/minimum-orders.md).
+
 Congratulations, you’ve now placed your first trade on 11/11. Now comes the fun part, watching your trade play out and timing the markets right. There are a few considerations, like funds and liquidations, you should know about before sitting back. Read the rest of the architecture documents for a better understanding of some of the nuances that come with trading perps.
