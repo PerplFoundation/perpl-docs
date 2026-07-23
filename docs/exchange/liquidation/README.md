@@ -2,6 +2,34 @@
 
 Liquidation occurs when the position value falls below the maintenance margin requirement. Liquidations are crucial for maintaining the protocol's functionality and protecting other traders.
 
+## Example: a $100k BTC long at 10x
+
+You post **$10,000** to open a **$100,000** position (10x leverage).
+
+* A 10% drop would wipe out your full $10,000.
+* But you are liquidated _before_ that — at a **6% drop, when BTC reaches $94,000**.
+
+At $94,000 your remaining margin is **$4,000**: your $10,000 deposit minus the $6,000 the move cost you. That surviving **$4,000 — the residual — is split**: **$3,200 (80%) is returned to you**, and **$400 (10%) each to the insurance fund and the protocol**.
+
+Because you are stopped _before_ your margin reaches zero, the amount you keep is 80% of whatever remains at that moment.
+
+> **Why a 6% drop and not 10%?** BTC's **maintenance margin is 4%** of the position. Liquidation triggers when your remaining margin falls to that level — not when it reaches zero. Higher leverage posts less initial margin, so your liquidation sits closer to the current price; the exact distance for your position is shown live in the Adjust Leverage dialog (see [Margin](../margin.md)).
+
+## Maintenance margin by market
+
+Your liquidation point is set by each market's **maintenance margin** — the minimum margin a position must keep before it is liquidated. It is a fixed protocol parameter (you do not choose it) and it varies by market:
+
+| Market | Maintenance margin | Maximum leverage |
+| ------ | ------------------ | ---------------- |
+| BTC    | 4%                 | 15x              |
+| ETH    | 5%                 | 12x              |
+| SOL    | 5%                 | 12x              |
+| MON    | 5%                 | 10x              |
+| HYPE   | 5%                 | 10x              |
+| ZEC    | ~6.7%              | 8x               |
+
+A 4% maintenance margin means a position is liquidated once its remaining margin falls to 4% of the position's value. Maximum leverage shown is the base maximum; initial margin requirements are dynamic and can rise — lowering the effective maximum — for larger positions or in volatile conditions (see [Margin](../margin.md)).
+
 Here is how liquidation works on Perpl:
 
 1. The liquidation engine identifies undercollateralized positions (positions where the value is at or beneath the maintenance margin)
