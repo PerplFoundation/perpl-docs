@@ -74,6 +74,17 @@ Math.round(0.1 * Math.pow(10, 5));  // => 10000
 Leverage in an `OrderRequest` and on `Order` / `Position` objects is in hundredths — send `1000` for 10x, `250` for 2.5x.
 {% endhint %}
 
+### Builder fees
+
+Integrations that route flow under a registered [builder code](builder-codes.md) charge a builder fee on top of the protocol fee. Two extra fields report it, both **omitted when zero** (so an ordinary account never sees them):
+
+| Field | On | Meaning |
+|---|---|---|
+| `bfa` | `Fill`, `Order`, `AccountEvent` | Builder-fee portion of that event's `f` (fee), in the same unit as `f` |
+| `tbf` | `AccountStats` | Lifetime builder fees, already included in `tf` (total fees) |
+
+Fees are reported **gross** — `f` (and `tf`) already include the builder portion, so never add `bfa` to `f` (or `tbf` to `tf`). The per-order builder fee itself is set in `per_100k` units, **not** micros; see [Builder Codes → Fee units](builder-codes.md#fee-units).
+
 ## Timestamps
 
 Three timestamp shapes appear across the types, each adding one more level of on-chain locality. All time fields (`t`) are Unix epoch **milliseconds**.

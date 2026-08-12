@@ -19,7 +19,7 @@
 
     #### [API Guide](api/authentication.md)
 
-    The HTTP and streaming surface: [Authentication](api/authentication.md), the [REST API](api/rest.md), the [WebSocket API](api/websocket.md), and shared [Types & Errors](api/types-and-errors.md).<br>
+    The HTTP and streaming surface: [Authentication](api/authentication.md), the [REST API](api/rest.md), the [WebSocket API](api/websocket.md), shared [Types & Errors](api/types-and-errors.md), and [Builder Codes](api/builder-codes.md) for fee-charging integrations.<br>
 
     #### [SDK Guide](sdk/install.md)
 
