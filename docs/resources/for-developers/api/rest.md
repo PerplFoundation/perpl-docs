@@ -286,7 +286,8 @@ interface AccountEvent {
   a: string;                // Amount change
   b: string;                // Updated balance
   lb: string;               // Locked balance
-  f: string;                // Fee
+  f: string;                // Fee (gross: protocol fee + `bfa`)
+  bfa?: string;             // Builder-fee portion of `f`, omitted when zero
 }
 ```
 

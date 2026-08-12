@@ -116,8 +116,16 @@ interface ApiKeyPayloadRequest {
   expires_at?: number;     // ms timestamp, 0 / omitted = never
   ip_cidrs?: string[];     // optional IP allow-list (max 4 CIDRs)
   target_profile?: string; // delegated account, if enrolling for one
+
+  // Builder codes only — see the Builder Codes page.
+  builder_id?: number;               // registered builder code, 1..255
+  max_builder_fee_per_100k?: number; // fee ceiling the user authorizes, 1 = 0.1 bps
 }
 ```
+
+{% hint style="info" %}
+To charge your own fee on the flow you route, enroll the key **bound to a builder code** by adding `builder_id` and `max_builder_fee_per_100k` here. The full flow — registration, the fee the user signs for, and how to charge it per order — is on the [Builder Codes](builder-codes.md) page.
+{% endhint %}
 
 It returns an `ApiKeyPayloadResponse`:
 
@@ -211,6 +219,12 @@ interface ApiKeyInfo {
   expires_at: number;    // ms, 0 = never
   last_used_at: number;  // ms, 0 = never
   created_at: number;    // ms
+
+  // Builder terms, present only on a builder-bound key — see Builder Codes.
+  builder_id?: number;                // the code the key submits under
+  builder_name?: string;              // registered display name; empty if the code is no longer registered — show builder_id instead
+  max_builder_fee_per_100k?: number;  // enrolled ceiling, 1 = 0.1 bps
+  max_builder_fee_pct?: string;       // the same ceiling formatted, e.g. "0.100%"
 }
 ```
 
@@ -417,3 +431,4 @@ The market-data WebSocket (`/ws/v1/market-data`) requires no authentication — 
 * [Networks](../networks-and-configuration.md) — endpoints, chain IDs, contract and collateral addresses, market IDs.
 * [REST Endpoints](rest.md) — the full list of HTTP endpoints and which require a signed request.
 * [WebSocket](websocket.md) — real-time streams, subscription frames, and order placement over the trading socket.
+* [Builder Codes](builder-codes.md) — charge your own fee on the flow you route, attributed to your registered code.

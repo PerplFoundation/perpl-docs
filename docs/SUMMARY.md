@@ -45,6 +45,7 @@
     * [REST](resources/for-developers/api/rest.md)
     * [Types & Errors](resources/for-developers/api/types-and-errors.md)
     * [WebSocket](resources/for-developers/api/websocket.md)
+    * [Builder Codes](resources/for-developers/api/builder-codes.md)
     * [Python](resources/for-developers/api/python.md)
     * [TypeScript](resources/for-developers/api/typescript.md)
   * [Best Practices](resources/for-developers/best-practices.md)

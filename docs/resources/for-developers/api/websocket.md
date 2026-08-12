@@ -336,6 +336,7 @@ The **WalletSnapshot** carries a sequence number (`sn` in the message header) th
 ```typescript
 interface OrderRequest {
   mt: 22;
+  sn?: number;         // Unique, non-zero — echoed as `cid` on the mt: 3 command status
   rq: number;          // Request ID (idempotency key; strictly increasing)
   mkt: number;         // Market ID
   acc: number;         // Account ID
@@ -353,8 +354,11 @@ interface OrderRequest {
   lp?: number;         // Linked position ID
   lv: number;          // Leverage (hundredths, e.g. 1000 = 10x)
   lb: number;          // Last execution block
+  bf?: number;         // Builder fee (per_100k, 1 = 0.1 bps); builder-bound keys only — see Builder Codes
 }
 ```
+
+> **Note:** `bf` charges your own fee on top of the protocol fee, attributed to your registered builder code and settled to you. It is only valid on a key that was enrolled bound to a builder code, and must not exceed the ceiling the user signed for. See [Builder Codes](builder-codes.md).
 
 #### Idempotency and Request IDs (`rq`)
 
@@ -456,6 +460,43 @@ ws.send(JSON.stringify({
 * `lb` should not exceed `head_block_number + market.order_ttl_blocks`.
 * The WebSocket is connected — check `ws.readyState === WebSocket.OPEN`.
 
+### Command Status (`mt: 3`)
+
+Every `mt: 22` frame receives **exactly one** `StatusResponse` (`mt: 3`) on the `sid: 100` command-status stream. It reports whether the gateway accepted the frame — **not** what happened to the order.
+
+```typescript
+interface StatusResponse {
+  mt: 3;
+  sid: 100;         // Command-status stream
+  sn: number;       // Server-assigned; not contiguous per stream
+  cid?: number;     // The `sn` you sent — omitted entirely when that `sn` was 0
+  status: {
+    code: number;   // 0 = accepted for forwarding; 400 = bad request; 403 = read-scoped key
+    error: string;
+  };
+}
+```
+
+**`code: 0` means accepted for forwarding — not posted, not filled.** The order's real outcome arrives later on the `mt: 24` order-updates stream. A non-zero `code` means the gateway rejected the frame before it reached the chain, and **no `mt: 24` message will ever follow for it**.
+
+**Correlation:** `cid` echoes the `sn` from your outbound frame (not `rq`), and is omitted whenever it would be zero. Set a unique, non-zero `sn` on every `mt: 22` frame — without one, neither acknowledgements nor rejections can be matched to the order that caused them.
+
+**Rejection reasons** (non-zero `code`):
+
+| `error` | Condition | `code` |
+|---|---|---|
+| `order already expired` | `tif > 0 && tif <= head` | 400 |
+| `last exec block already expired` | `lb > 0 && lb <= head` | 400 |
+| `last exec block too high` | `tp == 0 && lb > head + order_ttl_blocks` | 400 |
+| `trigger price condition is not specified` | `tp > 0 && tpc == 0` | 400 |
+| `order type is not provided` / `invalid order type` | invalid `t` | 400 |
+| `builder fee not permitted for this api key` | `bf` above the key's ceiling, or any `bf` on a non-builder key | 400 |
+| `api key lacks trade scope` | read-scoped key | 403 |
+
+**Failures that close the connection instead:** an unknown `mkt`, an `acc` not owned by the connected wallet, and any frame that fails to parse produce no `mt: 3` at all — the server closes with code `1011` (`failed to process`). Do not wait on a status that will never arrive; treat an unexpected close as a failure of every request still in flight (see [Error Handling and Reconnection](#error-handling-and-reconnection)).
+
+> **Note:** `mt: 3` reports admission only; everything after arrives on `mt: 24`. `sr: 14` (`ExceedsLastExecutionBlock`) can be produced without any transaction reaching the chain — do not treat it as evidence a transaction was submitted.
+
 ### Order Updates (`mt: 24`)
 
 ```typescript
@@ -494,6 +535,8 @@ interface WalletFills {
 ```
 
 Each fill carries a `LiquiditySide` (1 = Maker, 2 = Taker).
+
+> **Note:** On a key enrolled under a builder code, fills (and order updates, `mt: 24`) carry a `bfa` field — the builder-fee portion of that event's `f` (fee). It is omitted when zero. See [Builder Codes → Reconciling what was charged](builder-codes.md#reconciling-what-was-charged).
 
 ### Position Updates (`mt: 27`)
 
