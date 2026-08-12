@@ -4,3 +4,4 @@
 ^https://.*\.gitbook\.io
 ^https://api\.gitbook\.com
 ^https://static-.*\.gitbook\.com
+^https://etherscan\.io
