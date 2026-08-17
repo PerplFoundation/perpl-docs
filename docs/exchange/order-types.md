@@ -39,9 +39,18 @@ A market order fills against the resting liquidity in the order book, consuming 
 
 **Example.** A stop-loss triggers when the Mark Price falls to 63,583.0. At that instant the best bid is 63,534.9, and the size needed is spread across 8 resting orders down to 63,515.6 — so the position closes at an average of 63,519.8. The trigger fired on mark; the fill came from the book.
 
+### How a market order is built: a marketable limit IoC
+
+Perpl's smart contract has no native "market order." As noted above, the on-chain order primitives are all limit-style (OpenLong, OpenShort, CloseLong, CloseShort). When you submit a market order — or press **Close** — the app constructs it as a single **limit order priced at your maximum-slippage bound, with [Immediate-or-Cancel (IOC)](#order-options) time-in-force**. That order:
+
+* fills immediately against every resting order at or better than the slippage bound, walking the book level by level, and
+* **cancels whatever it cannot fill** within that bound.
+
+In other words, a "market order" is really _"take all available liquidity up to my slippage limit, then stop."_ It is never a promise to fill the whole size at any price — it is a promise never to fill worse than your slippage bound.
+
 ### Slippage protection
 
-Market orders carry a **maximum slippage** limit, set in the app's trade Settings (expressed on-chain as the order's [Threshold Price](#order-options)). The order fills across the book only up to that limit; any size that would fill beyond it is **not** executed. This is why a market order — including a one-click **Close** — can fill only partially, or not at all, on a thin book: the protocol will not execute it at a price worse than your slippage setting allows. Widening the limit trades a worse possible price for a higher chance of a complete fill.
+Your **maximum slippage** limit — set in the app's trade Settings, and carried on-chain as the order's [Threshold Price](#order-options) — is what sets that bound. Because the order is IoC, any size that would only fill beyond the bound is **not** executed: a market order, including a one-click **Close**, can come back **partially filled, or not filled at all**, on a thin or fast-moving book. If the whole book has moved past your bound, the IoC order has nothing to fill within range and is canceled — which can look like pressing Close and having nothing happen. Widening the slippage limit trades a worse possible price for a higher chance of a complete fill.
 
 ### Stop-Loss and Take-Profit: market vs. limit
 
