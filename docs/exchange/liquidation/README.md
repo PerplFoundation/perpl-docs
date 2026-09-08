@@ -54,7 +54,7 @@ Order book liquidations are initiated by the protocol; a position meeting the li
 <p align="center"><span class="math">0 &#x3C; FMV &#x3C;= MMR</span></p>
 
 _FMV = Position fair market value._\
-&#xNAN;_&#x4D;MR = Position Maintenance margin requirement._
+_MMR = Position Maintenance margin requirement._
 
 #### Calculating Liquidation Price
 

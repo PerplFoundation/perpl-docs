@@ -44,29 +44,29 @@ Perpetual contracts can be implemented using the following representation of lot
 <p align="center"><span class="math">N = P · L</span></p>
 
 _P = The mark, entry, or realized price, depending on whether or not the value being calculated is unrealized, position, or realized notional value, respectively._\
-&#xNAN;_&#x4C; = The position lot size (the number of contracts of the position)._
+_L = The position lot size (the number of contracts of the position)._
 
 **Position Margin Requirement,&#x20;**_**MR**_**:**
 
 <p align="center"><span class="math">MR = N/MF</span></p>
 
 _N = The position notional value._\
-&#xNAN;_&#x4D;F = The margin fraction (analogous to leverage)._
+_MF = The margin fraction (analogous to leverage)._
 
 **Position Initial Margin Requirement,&#x20;**_**IMR**_**:**
 
 <p align="center"><span class="math">IMR = N/IMF</span></p>
 
 _N = The position notional value._\
-&#xNAN;_&#x49;MF = Initial margin fraction (maximum leverage allowed to open a position)._
+_IMF = Initial margin fraction (maximum leverage allowed to open a position)._
 
 **Position Maintenance Margin Requirement,&#x20;**_**MMR**_**:**
 
 <p align="center"><span class="math">MMR = N/MMF</span></p>
 
 _N = The position notional value._\
-&#xNAN;_&#x4D;MF = Maintenance margin fraction (minimum collateralization permitted before a position can be_\
-&#xNAN;_&#x6C;iquidated)._
+_MMF = Maintenance margin fraction (minimum collateralization permitted before a position can be_\
+_liquidated)._
 
 #### Collateral Management
 
@@ -97,7 +97,7 @@ In some situations, for example, auto-deleveraging a position, a realization pri
 <p align="center"><span class="math">FMV >= IMR</span></p>
 
 _FMV = Position fair market value._\
-&#xNAN;_&#x49;MR = Position initial margin requirement._
+_IMR = Position initial margin requirement._
 
 {% hint style="info" %}
 **Reduce-only exemption**: Closing or decreasing a position does not require FMV >= IMR. This allows traders to close underwater positions that would otherwise be trapped.
@@ -108,7 +108,7 @@ _FMV = Position fair market value._\
 <p align="center"><span class="math">0 &#x3C; FMV &#x3C;= MMR</span></p>
 
 _FMV = Position fair market value._\
-&#xNAN;_&#x4D;MR = Position Maintenance margin requirement._
+_MMR = Position Maintenance margin requirement._
 
 **Collateralization for Auto Deleverage (ADL):**
 
