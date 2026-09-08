@@ -65,8 +65,8 @@ To derive a virtualized implicit funding payment settlement solution, consider t
 <p align="center"><span class="math">F_{payment}[j] = P_i[j] · F_{rate}[j] · L</span></p>
 
 _Frate\[j] = Funding rate for funding event at block number j._\
-&#xNAN;_&#x50;_<sub>_i_</sub>_&#x20;=_ Funding rate price, which is the spot index price at the time of the funding event.\
-&#xNAN;_&#x4C; = Position lot size._
+_P_<sub>_i_</sub>_&#x20;=_ Funding rate price, which is the spot index price at the time of the funding event.\
+_L = Position lot size._
 
 The position lot size L, and side (long or short), remain constant throughout each funding event during which a position is held (a smart contract constraint forces the realization of funding payments when the position lot size or side is changed).
 
@@ -78,16 +78,16 @@ Importantly, the funding product is independent of information specific to an in
 <p align="center"><span class="math">F_{product}[j] = P_i[j] · F_{rate}[j]</span></p>
 
 _F_<sub>_product_</sub>_\[j] = Funding product for funding event at block number j._\
-&#xNAN;_&#x50;_<sub>_i_</sub>_&#x20;=_ Funding rate price, which is the spot index price at the time of the funding event.\
-&#xNAN;_&#x46;_<sub>_rate_</sub>_\[j] = Funding rate for funding event at block number j._\
-&#xNAN;_&#x6A; = funding event block number._
+_P_<sub>_i_</sub>_&#x20;=_ Funding rate price, which is the spot index price at the time of the funding event.\
+_F_<sub>_rate_</sub>_\[j] = Funding rate for funding event at block number j._\
+_j = funding event block number._
 
 Substituting equation F<sub>product</sub> into equation F<sub>payment</sub> yields the following equation for the funding payment:
 
 <p align="center"><span class="math">F_{payment}[j] = (F_{product}[j]) · L</span></p>
 
 _F_<sub>_product_</sub>_\[j] = Funding product for funding event at block number j._\
-&#xNAN;_&#x4C; = Position lot size._
+_L = Position lot size._
 
 The funding product sum is the sum of all previous funding products. The funding product sum is causal\
 and thus is defined as zero prior to the creation of the perpetual contract.
@@ -95,37 +95,37 @@ and thus is defined as zero prior to the creation of the perpetual contract.
 <p align="center"><span class="math">F_{sum}[j] = \begin{cases} 0, &#x26; j \leq i \\ \sum_{j=i}^{N} F_{product}[j], &#x26; j > i \end{cases}</span></p>
 
 _F_<sub>_product_</sub>_\[j] = Funding product for funding event at block number j._\
-&#xNAN;_&#x6A; = funding event block number._\
-&#xNAN;_&#x69; = Perpetual contract creation block number._
+_j = funding event block number._\
+_i = Perpetual contract creation block number._
 
 A funding product of a particular block can be determined by subtracting any two adjacent funding sums, as shown in the equation below:
 
 <p align="center"><span class="math">F_{product}[j] = F_{sum}[j] − F_{sum}[j − k]</span></p>
 
 _F_<sub>_sum_</sub>_\[j] = Funding product sum for funding event._\
-&#xNAN;_&#x46;_<sub>_sum_</sub>_\[j − k] = Funding product sum for previous funding event._\
-&#xNAN;_&#x6A; = funding event block number._\
-&#xNAN;_&#x6B; = The number of blocks in a funding interval._
+_F_<sub>_sum_</sub>_\[j − k] = Funding product sum for previous funding event._\
+_j = funding event block number._\
+_k = The number of blocks in a funding interval._
 
 Substituting equation F<sub>product</sub> into equation F<sub>payment</sub>, the funding payment for a position that has been held through a single funding event at block j, can be computed:
 
 <p align="center"><span class="math">F_{payment}[j] = (F_{sum}[j] − F_{sum}[j − k]) · L</span></p>
 
 _F_<sub>_sum_</sub>_\[j] = Funding product sum for funding event._\
-&#xNAN;_&#x46;_<sub>_sum_</sub>_\[j − k] = Funding product sum for previous funding event._\
-&#xNAN;_&#x6A; = funding event block number._\
-&#xNAN;_&#x6B; = The number of blocks in a funding interval._\
-&#xNAN;_&#x4C; = Position lot size._
+_F_<sub>_sum_</sub>_\[j − k] = Funding product sum for previous funding event._\
+_j = funding event block number._\
+_k = The number of blocks in a funding interval._\
+_L = Position lot size._
 
 Observing that equation _F_<sub>_payment_</sub> only depends on the lot size and side (long or short) of a position, it is possible to extend the solution to compute funding payments cumulatively owed for a position held through multiple events. For example, consider a position held through 3 funding events, up to and including a funding event at block j. Its cumulative funding payment could be computed as follows:
 
 <p align="center"><span class="math">F_{payment}[j] = (F_{sum}[j] − F_{sum}[j − 3k]) · L</span></p>
 
 _F_<sub>_sum_</sub>_\[j] = Funding product sum for funding event._\
-&#xNAN;_&#x46;_<sub>_sum_</sub>_\[j − 3k] = Funding product sum for the three funding events prior._\
-&#xNAN;_&#x6A; = funding event block number._\
-&#xNAN;_&#x6B; = The number of blocks in a funding interval._\
-&#xNAN;_&#x4C; = Position lot size._
+_F_<sub>_sum_</sub>_\[j − 3k] = Funding product sum for the three funding events prior._\
+_j = funding event block number._\
+_k = The number of blocks in a funding interval._\
+_L = Position lot size._
 
 Importantly, notice that the cumulative funding payment owed can be determined in only two read operations. An important gas efficiency. Furthermore, the value of the funding payment need not be written to the chain until the entire position settles, bypassing the problem of immediate explicit settlement.
 
@@ -134,7 +134,7 @@ Thus, the generalized solution to compute any position’s cumulative funding pa
 <p align="center"><span class="math">θ_{pnl} = F_{payment}[j] = (F_{sum}[j] − F_{sum}[m]) · L</span></p>
 
 _F_<sub>_sum_</sub>_\[j] = Funding product sum for funding event._\
-&#xNAN;_&#x46;_<sub>_sum_</sub>_\[m] = Funding product sum for funding event prior to position creation._\
-&#xNAN;_&#x6A; = funding event block number._\
-&#xNAN;_&#x6D; = The funding event block number for the funding event prior to position creation._\
-&#xNAN;_&#x4C; = Position lot size._
+_F_<sub>_sum_</sub>_\[m] = Funding product sum for funding event prior to position creation._\
+_j = funding event block number._\
+_m = The funding event block number for the funding event prior to position creation._\
+_L = Position lot size._
