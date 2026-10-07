@@ -48,6 +48,8 @@
     * [Builder Codes](resources/for-developers/api/builder-codes.md)
     * [Python](resources/for-developers/api/python.md)
     * [TypeScript](resources/for-developers/api/typescript.md)
+    * [api-docs-main](resources/for-developers/api/api-docs-main/README.md)
+      * [websocket](resources/for-developers/api/api-docs-main/websocket.md)
   * [Best Practices](resources/for-developers/best-practices.md)
   * [Networks & Configuration](resources/for-developers/networks-and-configuration.md)
   * [SDK](resources/for-developers/sdk/README.md)
@@ -60,3 +62,12 @@
 * [Terms of Use](https://perpl.xyz/terms-of-use)
 * [🕵️ Privacy Policy](https://perpl.xyz/privacy-policy)
 * [🎨 Brand Kit](https://aionex.notion.site/perpl-brand-kit)
+
+***
+
+* [authentication](authentication.md)
+* [integrations](integrations.md)
+* [README](readme.md)
+* [examples](examples.md)
+* [rest endpoints](rest-endpoints.md)
+* [types](types.md)

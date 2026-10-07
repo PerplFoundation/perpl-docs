@@ -1,0 +1,918 @@
+# types
+
+All types are derived from the backend API specification (Go → TypeScript via tygo).
+
+## Primitive Types
+
+```typescript
+type ChainID = number;       // uint64 - EIP-155 chain ID
+type InstanceID = number;    // uint32 - Protocol instance ID
+type TokenID = number;       // uint32 - Token ID
+type MarketID = number;      // uint32 - Market ID
+type PerpetualID = number;   // uint32 - Perpetual ID (smart contract)
+type FeeLevelID = number;    // uint32 - Fee level ID
+type AccountID = number;     // uint64 - Trading account ID
+type OrderID = number;       // uint64 - Order ID
+type RequestID = number;     // uint64 - Request ID (idempotency key)
+type PositionID = number;    // uint64 - Position ID
+type Decimals = number;      // uint8 - Decimal places
+type Fraction = number;      // uint32 - Fraction in hundredths
+type Micros = number;        // int64 - Value in 10^-6 fractions
+type Amount = string;        // Decimal string for large numbers
+type Price = number;         // uint64 - Scaled price
+type SPrice = number;        // int64 - Signed scaled price
+type Size = number;          // uint64 - Scaled size
+```
+
+## Scaling
+
+Prices and sizes are scaled integers. Use market config for decimals:
+
+```typescript
+// Convert scaled price to human readable
+function scalePrice(scaled: number, priceDecimals: number): number {
+  return scaled / Math.pow(10, priceDecimals);
+}
+
+// Convert human price to scaled
+function unscalePrice(price: number, priceDecimals: number): number {
+  return Math.round(price * Math.pow(10, priceDecimals));
+}
+
+// Example: BTC price with 1 decimal
+// scaled: 950000 → human: $95,000.0
+// human: $95,000.0 → scaled: 950000
+```
+
+***
+
+## Timestamps
+
+### BlockTimestamp
+
+```typescript
+interface BlockTimestamp {
+  b?: number;  // Block number
+  t?: number;  // Timestamp (milliseconds)
+}
+```
+
+### BlockTxTimestamp
+
+```typescript
+interface BlockTxTimestamp {
+  b?: number;    // Block number
+  t?: number;    // Timestamp (ms)
+  tx?: number;   // Transaction index in block
+  txid?: string; // Transaction hash
+}
+```
+
+### BlockTxLogTimestamp
+
+```typescript
+interface BlockTxLogTimestamp {
+  b?: number;    // Block number
+  t?: number;    // Timestamp (ms)
+  tx?: number;   // Transaction index
+  txid?: string; // Transaction hash
+  l?: number;    // Log index in transaction
+}
+```
+
+***
+
+## Chain & Protocol
+
+### Chain
+
+```typescript
+interface Chain {
+  ver: number;
+  chain_id: ChainID;
+  name?: string;
+  icons?: string[];
+  native_token?: Token;
+  rpc_urls?: string[];
+  block_explorer_urls?: string[];
+  gas: GasPrice;
+}
+```
+
+### Token
+
+```typescript
+interface Token {
+  ver: number;
+  id?: TokenID;
+  address?: string;       // ERC-20 address (empty for native)
+  symbol: string;
+  name: string;
+  icon?: string;
+  decimals: Decimals;
+  display_precision: Decimals;
+  usd_index?: string;
+}
+```
+
+### ProtocolInstance
+
+```typescript
+interface ProtocolInstance {
+  ver: number;
+  id: InstanceID;
+  address: string;                    // Exchange contract
+  collateral_token_id: TokenID;
+  min_account_open_amount: Amount;
+  min_deposit_amount: Amount;      // Minimal deposit to top up an account
+  min_withdraw_amount: Amount;     // Minimal withdrawal amount
+  max_account_equity?: Amount;
+  max_account_trigger_orders: number;
+}
+```
+
+### GasPrice
+
+```typescript
+interface GasPrice {
+  at: BlockTimestamp;
+  h: number;      // Head block
+  max: Amount;    // Maximum priority
+  p95: Amount;    // 95th percentile (top 5% of the order book)
+  p50: Amount;    // 50th percentile
+  min: Amount;    // Minimum priority
+  base: Amount;   // Base fee only
+}
+```
+
+***
+
+## Context
+
+### Context
+
+Top-level payload returned by `/pub/context`.
+
+```typescript
+interface Context {
+  chain: Chain;
+  instances: ProtocolInstance[];
+  tokens: Token[];
+  markets: Market[];
+}
+```
+
+***
+
+## Market
+
+### Market
+
+```typescript
+interface Market {
+  ver: number;
+  id: MarketID;
+  instance_id: InstanceID;
+  perpetual_id: PerpetualID;
+  symbol: string;
+  name: string;
+  size_units: string;
+  icon: string;
+  funding_interval_sec: number;
+  funding_interval_blocks: number;
+  order_ttl_blocks: number;               // lb ceiling offset from head: lb <= head + order_ttl_blocks
+  order_retry_blocks: number;
+  order_max_market_slippage_bps: number;  // Max market order slippage (bps)
+  order_max_neg_pnl_collat_bps: number;   // Default negative-PnL collateralization limit (bps), used when an order omits `mnp`
+  config: MarketConfig;
+  state: MarketState;
+  funding: FundingEvent;
+  points_boost_bps: number;   // Per-market points boost (bps, 10000 = 1x)
+}
+```
+
+### MarketConfig
+
+```typescript
+interface MarketConfig {
+  at: BlockTimestamp;
+  is_open: boolean;
+  price_decimals: Decimals;
+  size_decimals: Decimals;
+  min_posting_amount: Amount;
+  min_settle_amount: Amount;
+  initial_margin: Fraction;       // e.g., 1000 = 10% (10x max)
+  maintenance_margin: Fraction;   // e.g., 2000 = 5%
+  maker_fee: Micros;              // Base-tier maker fee; equals maker_fees[0]
+  taker_fee: Micros;              // Base-tier taker fee; equals taker_fees[0]
+  maker_fees?: Micros[];          // Maker fee per fee tier, indexed by Account.ft
+  taker_fees?: Micros[];          // Taker fee per fee tier, indexed by Account.ft
+  recycle_fee: Amount;
+  funding_sum_scaling_exp: number;
+}
+```
+
+Fee rates are in **micros** (`10^-6` fractions): `1000` = 0.1% = 10 bps. See [Fees & fee tiers](/broken/pages/420850a9cc70d23e5e7ca5773d00acb193495ad8#fees--fee-tiers) for how to pick the right entry and compute what an order costs.
+
+### MarketState
+
+```typescript
+interface MarketState {
+  at: BlockTimestamp;
+  orl: Price;   // Oracle price
+  mrk: Price;   // Mark price
+  lst: Price;   // Last trade price
+  mid: Price;   // Mid price
+  bid: Price;   // Best bid
+  ask: Price;   // Best ask
+  prv: Price;   // Price 24h ago
+  dv: Size;     // Daily volume (size)
+  dva: Amount;  // Daily volume (amount)
+  oi: Size;     // Open interest
+  tvl: Amount;  // Total value locked
+}
+```
+
+### FundingEvent
+
+```typescript
+interface FundingEvent {
+  at: BlockTimestamp;  // Block/timestamp the rate is applied at (same block as `feb`)
+  feb: number;    // Funding event block, same as `at.b`
+  rate: Micros;   // Funding rate (10^-6)
+  idx: Price;     // Index price
+  ppl: SPrice;    // Payment per lot
+  sum: SPrice;    // Funding sum
+  div: number;    // Scaling divider of the funding sum
+}
+```
+
+`at` is the point in time the rate **applies** at, not the one the event was published at. The exchange requires a funding rate to be set shortly _before_ the block it applies to, so:
+
+* `at` runs slightly ahead of the chain head (under a minute) for the newest event, and events sit on a regular grid one funding interval apart.
+* Until the block it applies at is reached, `at.t` of the newest event is an estimate. The event is republished with the exact timestamp once that block arrives, so a funding interval produces **two** messages on the `funding@<chain_id>` stream: the rate, then the same rate with its final timestamp. Both carry the same `feb`, which identifies the interval — treat a repeat of a known `feb` as an update, not a new funding event.
+
+***
+
+## Order
+
+### Order
+
+```typescript
+interface Order {
+  at: BlockTxLogTimestamp;  // Update timestamp
+  c: BlockTxTimestamp;      // Creation timestamp
+  // Request ID is an user set ID for this Order, when using the API it is equivalent to a client_order_id with deduplication
+  // and must be monotonically increasing, for smart contract users it can be freely set to any value to identify the order
+  rq: RequestID;
+  mkt: MarketID;
+  acc: AccountID;
+  oid: OrderID;
+  scid: OrderID;            // Smart contract order ID
+  st: OrderStatus;
+  sr: OrderStatusReason;
+  fr?: OrderFailureReason;  // Detail behind `sr` on a post/settlement failure, omitted otherwise
+  t: OrderType;
+  r?: boolean;              // Remove from open orders
+  p?: Price;                // Limit price (0 = market)
+  os: Size;                 // Original size
+  fp: Price;                // Fill price (weighted avg)
+  fs: Size;                 // Filled size
+  f: Amount;                // Fee paid (gross: protocol fee + `bfa`)
+  bfa?: Amount;             // Builder-fee portion of `f`, omitted when zero
+  tif?: number;             // Time-in-force block
+  fl: OrderFlags;
+  tp?: Price;               // Trigger price
+  tpc?: TriggerPriceCondition;
+  lp?: PositionID;          // Linked position
+  mm: number;               // Max matches
+  lv: number;               // Leverage (hundredths)
+}
+```
+
+### OrderType
+
+| Value | Name                       | Description          |
+| ----- | -------------------------- | -------------------- |
+| 0     | Unspecified                |                      |
+| 1     | OpenLong                   | Open long position   |
+| 2     | OpenShort                  | Open short position  |
+| 3     | CloseLong                  | Close long position  |
+| 4     | CloseShort                 | Close short position |
+| 5     | Cancel                     | Cancel order         |
+| 6     | IncreasePositionCollateral | Add margin           |
+| 7     | Change                     | Modify order         |
+
+### OrderStatus
+
+| Value | Name            |
+| ----- | --------------- |
+| 0     | Unspecified     |
+| 1     | Pending         |
+| 2     | Open            |
+| 3     | PartiallyFilled |
+| 4     | Filled          |
+| 5     | Canceled        |
+| 6     | Expired         |
+| 7     | Failed          |
+| 8     | Untriggered     |
+| 9     | Triggered       |
+| 10    | Executed        |
+
+### OrderFlags
+
+| Value | Name              | Description                          |
+| ----- | ----------------- | ------------------------------------ |
+| 0     | GoodTillCancel    | Default, stays until filled/canceled |
+| 1     | PostOnly          | Only maker, rejects if would take    |
+| 2     | FillOrKill        | Fill entire order or cancel          |
+| 4     | ImmediateOrCancel | Fill what's available, cancel rest   |
+
+### TriggerPriceCondition
+
+| Value | Name        | Description                        |
+| ----- | ----------- | ---------------------------------- |
+| 0     | Unspecified |                                    |
+| 1     | GTELast     | Trigger when last price >= trigger |
+| 2     | LTELast     | Trigger when last price <= trigger |
+| 3     | GTEMark     | Trigger when mark price >= trigger |
+| 4     | LTEMark     | Trigger when mark price <= trigger |
+
+### OrderStatusReason
+
+| Value | Name                                    |
+| ----- | --------------------------------------- |
+| 0     | Unspecified                             |
+| 1     | AmountExceedsAvailableBalance           |
+| 2     | AccountFrozen                           |
+| 3     | CancelExistingInvalidCloseOrders        |
+| 4     | CantChangeCloseOrder                    |
+| 5     | ChangeExpiredOrderNeedsNewExpiry        |
+| 6     | ClearingExpiredOrder                    |
+| 7     | ClearingFrozenAccountOrder              |
+| 8     | ClearingInvalidCloseOrder               |
+| 9     | ClearingSelfMatchingOrder               |
+| 10    | CloseOrderExceedsPosition               |
+| 11    | CloseOrderPositionMismatch              |
+| 12    | ContractNotOperational                  |
+| 13    | CrossesBook                             |
+| 14    | ExceedsLastExecutionBlock               |
+| 15    | ForwardingReverted                      |
+| 16    | ImmediateOrCancelExecuted               |
+| 17    | ImmediateOrderUnderMinimum              |
+| 18    | InsuficientFundsForRecycleFee           |
+| 19    | InvalidAccountFrozenOrder               |
+| 20    | InvalidExpiryBlock                      |
+| 21    | InvalidOrderId                          |
+| 22    | MakerOrderFilled                        |
+| 23    | MakerOrderSettlementFailed              |
+| 24    | MaximumAccountOrders                    |
+| 25    | MaxMatchesReached                       |
+| 26    | NoOp                                    |
+| 27    | OrderBookFull                           |
+| 28    | OrderCancelled                          |
+| 29    | OrderCancelledByAdmin                   |
+| 30    | OrderCancelledByLiquidator              |
+| 31    | OrderChanged                            |
+| 32    | OrderDescIdTooLow                       |
+| 33    | OrderDoesNotExist                       |
+| 34    | OrderForwardingNotAllowed               |
+| 35    | OrderPlaced                             |
+| 36    | OrderPostFailed                         |
+| 37    | OrderSettlementImpliesInsolvent         |
+| 38    | OrderSizeExceedsAvailableSize           |
+| 39    | PostOrderUnderMinimum                   |
+| 40    | PriceOutOfRange                         |
+| 41    | RecycleBalanceInsufficientSevere        |
+| 42    | SizeOutOfRange                          |
+| 43    | TakerOrderFilled                        |
+| 44    | TakerOrderSettlementFailed              |
+| 45    | UnableToCancelOrder                     |
+| 46    | UnmatchedLotRemainsInFillOrKill         |
+| 47    | UnspecifiedCollateral                   |
+| 48    | UnspecifiedPrice                        |
+| 49    | UnspecifiedSize                         |
+| 50    | WrongAccountForOrder                    |
+| 51    | WrongChainForOrder                      |
+| 52    | WrongMarketForOrder                     |
+| 53    | PerpetualInsolvent                      |
+| 54    | Triggered                               |
+| 55    | InvalidAmount                           |
+| 56    | InvalidFlags                            |
+| 57    | InvalidTriggerOrder                     |
+| 58    | WrongTriggerPosition                    |
+| 59    | TriggerDescIdTooLow                     |
+| 60    | TriggerOrderRequest                     |
+| 61    | ValueExceedsMaximum                     |
+| 62    | ClearingRemainingOrderLockBeyondBalance |
+| 63    | PriceSetDuringTriggerExec               |
+| 64    | TriggeredExecutionAttemptsExhausted     |
+| 65    | TriggeredOrderExecuted                  |
+| 66    | TriggeredOrderPartiallyFilled           |
+| 67    | TriggeredOrderExpired                   |
+| 68    | TriggeredOrderRecoverableFailure        |
+| 69    | OrderExtensionRejected                  |
+
+### OrderFailureReason
+
+Present as `fr` on order events whose `sr` is `OrderPostFailed` (36), `MakerOrderSettlementFailed` (23) or `TakerOrderSettlementFailed` (44). Those three say _where_ the order failed — posting, or settlement as maker or taker — and `fr` says _why_ the exchange refused it. Omitted on every other event, and on order snapshots (which carry no `sr` either).
+
+| Value | Name                           | Meaning                                                                                                                                                                                                                                                                                                                  |
+| ----- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 0     | Unspecified                    | The order did not fail, or failed before the exchange evaluated it                                                                                                                                                                                                                                                       |
+| 1     | InsufficientBalance            | Account balance is below the collateral, negative-PnL collateral and fee the new position requires                                                                                                                                                                                                                       |
+| 2     | InsufficientCollateralIncrease | Available collateral is below what increasing the existing position requires                                                                                                                                                                                                                                             |
+| 3     | InsufficientCollateralInvert   | Available collateral is below what inverting the existing position requires                                                                                                                                                                                                                                              |
+| 4     | NoPositionToClose              | A close order was evaluated against a position that does not exist                                                                                                                                                                                                                                                       |
+| 5     | PerpetualSolvency              | Settling at this price would leave the perpetual insolvent                                                                                                                                                                                                                                                               |
+| 6     | NegativePositionValue          | Closing or decreasing the position would realise a negative position value                                                                                                                                                                                                                                               |
+| 7     | ReferencePriceStale            | No fresh reference price was available to value the order against                                                                                                                                                                                                                                                        |
+| 8     | ExceedsMaxNegPnlCollat         | The negative PnL the order would have to collateralize against the mark price exceeds the limit the order was placed with — the `mnp` sent on the request, or the market's `order_max_neg_pnl_collat_bps` if it was omitted. See [Placing Orders](/broken/pages/daecbdc03d39e92516bbf05b8f6afe85bb178aae#placing-orders) |
+| 9     | Other                          | The order failed for a reason this API version does not publish yet                                                                                                                                                                                                                                                      |
+
+`5` (PerpetualSolvency) only ever accompanies a settlement failure: an order is allowed to rest on the book in that state, so it is never a posting failure.
+
+`8` (ExceedsMaxNegPnlCollat) is also settlement-only, and only on a fill that creates, increases or inverts a position — the limit is not evaluated when an order is posted, and a purely reducing fill never collateralizes negative PnL. Each side of a fill is judged against its own limit: a maker whose limit is exceeded is cleared from the book while the taker fills on from other inventory, whereas a taker whose limit is exceeded unwinds the whole settlement and fills nothing. See [Placing Orders](/broken/pages/daecbdc03d39e92516bbf05b8f6afe85bb178aae#placing-orders) for both sides in detail.
+
+### OrderSpec
+
+An order placement, change or cancellation **as the client describes it** — the same description on both transports. It is what a WebSocket `OrderRequest` (mt: 22) carries under its message header, and what the [order submission endpoint](/broken/pages/3ef674fd3bc6a5a9038554b57f0fb85f991387af#post-apiv1tradingorders) accepts without one.
+
+```typescript
+interface OrderSpec {
+  rq: RequestID;    // Request ID — idempotency key, must not decrease per account
+  mkt: MarketID;
+  acc: AccountID;
+  oid?: OrderID;    // Order to change or cancel; omit for new orders
+  t: OrderType;
+  p?: Price;        // Limit price (0 = market)
+  s: Size;          // Size (scaled)
+  a?: Amount;       // Amount — OrderTypeIncreasePositionCollateral only
+  ms?: number;      // Max market-order slippage, bps (0 = market default)
+  mnp?: number;     // Max negative PnL to collateralize on a fill, bps of resulting notional
+  tif?: number;     // Good-till block (GTC if unspecified; ignored for trigger orders)
+  fl: OrderFlags;
+  tp?: Price;       // Trigger price
+  tpc?: TriggerPriceCondition;
+  tr?: RequestID;   // Request whose outcome activates this trigger order
+  lp?: PositionID;  // Position this trigger order is linked to
+  lv: number;       // Leverage (hundredths, e.g. 1000 = 10x)
+  lb: number;       // Last execution block (head < lb <= head + order_ttl_blocks, or 0)
+  bf?: number;      // Builder fee, hundred-thousandths — builder-bound keys only
+}
+```
+
+Field-by-field semantics, the at-most-once delivery rules and the retry strategy are documented at [Placing Orders](/broken/pages/daecbdc03d39e92516bbf05b8f6afe85bb178aae#placing-orders) and apply identically on both transports.
+
+### BatchOrderRequest
+
+Several `OrderSpec`s in one request, each with the meaning it has on its own — the rules on request IDs, retries and at-most-once execution are **per order, not per batch**. The orders may name different markets and different accounts of the calling wallet, and are handed to the exchange in the order they are listed.
+
+```typescript
+interface BatchOrderRequest {
+  mt?: 30;         // MsgTypeBatchOrderRequest
+  sn?: number;     // Echoed as `cid` on the response
+  d: OrderSpec[];  // 1–100 orders
+}
+```
+
+Accepted by the [order submission endpoint](/broken/pages/3ef674fd3bc6a5a9038554b57f0fb85f991387af#post-apiv1tradingorders) only. The message type is allocated on both transports, but the WebSocket connection does not currently accept a batch frame — submit orders there one `OrderRequest` (mt: 22) at a time.
+
+### BatchStatusResponse
+
+The answer to a request carrying several operations: one `Status` per operation, at the position of the operation it answers.
+
+```typescript
+interface BatchStatusResponse {
+  mt: 31;              // MsgTypeBatchStatusResponse
+  cid?: number;        // `sn` of the request, when it carried one
+  status: Status;      // Status of the request as a whole
+  statuses?: Status[]; // Status of each operation, in request order
+}
+
+interface Status {
+  code: number;        // 0 = success
+  error?: string;      // Human-readable description
+}
+```
+
+A **zero** `status.code` means the operations were judged individually and `statuses` carries their outcomes. A **non-zero** `status.code` means the request was refused before any operation was looked at: nothing was acted on and `statuses` is empty.
+
+Operations do not share a fate — a batch is not a transaction, and some of it succeeding while the rest is refused is the normal outcome, not an error.
+
+***
+
+## Fill
+
+```typescript
+interface Fill {
+  at: BlockTxLogTimestamp;
+  mkt: MarketID;
+  acc: AccountID;
+  oid: OrderID;
+  t: OrderType;
+  l: LiquiditySide;   // 1=Maker, 2=Taker
+  p?: Price;          // Fill price
+  s: Size;            // Filled size
+  f: Amount;          // Fee (negative = rebate); gross: protocol fee + `bfa`
+  bfa?: Amount;       // Builder-fee portion of `f`, omitted when zero
+}
+```
+
+`bfa` is non-zero only for fills of orders placed with a builder-bound API key that requested a fee — see [Integrations → Builder codes](/broken/pages/9cc1621507a182d4c7246a140f64b42fe0789c99#builder-codes). It follows the account fee onto every fill that changes a position's size, closes included.
+
+### LiquiditySide
+
+| Value | Name        |
+| ----- | ----------- |
+| 0     | Unspecified |
+| 1     | Maker       |
+| 2     | Taker       |
+
+***
+
+## Position
+
+```typescript
+interface Position {
+  at: BlockTxLogTimestamp;
+  mkt: MarketID;
+  acc: AccountID;
+  pid: PositionID;
+  rq: RequestID;
+  oid: OrderID;
+  st: PositionStatus;
+  sr: PositionStatusReason;
+  sd: PositionType;    // 1=Long, 2=Short
+  c: Amount;           // Collateral
+  ep: Price;           // Entry price
+  epr?: number;        // Q16 fractional residue of EntryPrice
+  s: Size;             // Size
+  fee: Amount;         // Fees to charge against this position/event (see below)
+  cfee?: Amount;       // Fee the close or decrease itself paid; included in `fee`
+  efs: SPrice;         // Entry funding sum
+  lv: number;          // Leverage (hundredths)
+  dpnl?: Amount;       // Realized delta PnL
+  fnd?: Amount;        // Realized funding PnL
+  xp?: Price;          // Exit price
+  xfs: SPrice;         // Exit funding sum
+  ots: BlockTxTimestamp; // Open timestamp
+  e?: Position[];      // Settlement events (update only)
+}
+```
+
+The same shape is used for a **position snapshot** and for each entry of `e`, a **settlement event**. In an event the amount fields report what _that event_ moved rather than the position's standing state, and `sr` says which kind of event it is and therefore which fields are meaningful.
+
+### Fees on a position
+
+`fee` is the total to charge against this position or event as the corresponding "cost" when computing PnL/ROI, **including any builder fee** — a position does not report the builder share separately the way trades and account totals do. Its meaning differs between the two forms the type is used in:
+
+| Where                                                                 | `fee` holds                                                                                                                                                                                                                                                                                                                                                | `cfee`                                    |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| **Snapshot** (a live position)                                        | The entry-side fees still outstanding against the position, proportional to its remaining size. Indicative: the amount was actually charged when the position was opened or increased, and this is the share of it the remaining size carries. **It does not include the fee that closing the remaining size will cost**, which is not knowable in advance | Always `0`                                |
+| **Event that adds size** (`sr`: 17 Increased, 21 Opened, 18 Inverted) | What that fill charged                                                                                                                                                                                                                                                                                                                                     | `0`                                       |
+| **Event that removes size** (`sr`: 13 Closed, 14 Decreased)           | The pro-rata entry fees the closed size released **plus** `cfee`. Subtract it from the event's realized PnL for a net figure                                                                                                                                                                                                                               | The fee the close or decrease itself paid |
+| **Liquidation / deleverage / unwind** (`sr`: 19, 15, 22)              | The entry share released                                                                                                                                                                                                                                                                                                                                   | `0` — these are not charged a trading fee |
+
+So on an exit, `fee - cfee` is the entry side and `cfee` is the exit side. Use `fee` for PnL; use `cfee` only when you want to show the two apart.
+
+`cfee` is reported as **zero rather than omitted** everywhere it does not apply: on a snapshot, on events that add to a position, and on the exits the exchange does not charge — liquidation, deleveraging, unwinding, and closing a frozen account. Read `sr` to know which kind of event you are looking at rather than treating a zero `cfee` as a signal in its own right.
+
+An **inversion** — an order that crosses through flat and opens the other side — is one fill reported as two events at the same log position: an `sr: 13` for the side that closed, carrying its `cfee`, and an `sr: 18` for the side that opened, carrying its entry fee. The contract charges the inversion as a single fee on the full order lot and it is split between the two rows by size, so summing across both is correct and neither double-counts.
+
+### PositionType
+
+| Value | Name        |
+| ----- | ----------- |
+| 0     | Unspecified |
+| 1     | Long        |
+| 2     | Short       |
+
+### PositionStatus
+
+| Value | Name        |
+| ----- | ----------- |
+| 0     | Unspecified |
+| 1     | Open        |
+| 2     | Closed      |
+| 3     | Liquidated  |
+| 4     | Deleveraged |
+| 5     | Unwound     |
+| 6     | Failed      |
+
+### PositionStatusReason
+
+Common values:
+
+| Value | Name                |
+| ----- | ------------------- |
+| 13    | PositionClosed      |
+| 14    | PositionDecreased   |
+| 15    | PositionDeleveraged |
+| 17    | PositionIncreased   |
+| 18    | PositionInverted    |
+| 19    | PositionLiquidated  |
+| 21    | PositionOpened      |
+| 22    | PositionUnwound     |
+
+***
+
+## Account & Wallet
+
+### Wallet
+
+```typescript
+interface Wallet {
+  mt: number;
+  at: BlockTimestamp;
+  addr: string;           // Wallet address
+  n: number;              // Current nonce
+  fl: FeeLevelID;
+  as?: Account[];         // Accounts (snapshot only)
+  sts?: AccountStats[];   // Account statistics (snapshot only)
+}
+```
+
+### Account
+
+```typescript
+interface Account {
+  mt: number;
+  in: InstanceID;
+  id: AccountID;
+  fr: boolean;      // Is frozen
+  fw: boolean;      // Allows forwarding
+  ft: number;       // Fee tier (uint8) — indexes MarketConfig.maker_fees / taker_fees
+  lfr: RequestID;   // Last forwarded request ID (use to seed `rq` generation)
+  b: Amount;        // Balance
+  lb: Amount;       // Locked balance
+  h?: AccountEvent[];
+}
+```
+
+### AccountEvent
+
+```typescript
+interface AccountEvent {
+  at: BlockTxLogTimestamp;
+  in: InstanceID;
+  id: AccountID;
+  et: AccountEventType;
+  m?: MarketID;
+  r?: OrderID;      // Request ID
+  o?: OrderID;
+  p?: PositionID;
+  a: Amount;        // Amount change
+  b: Amount;        // Updated balance
+  lb: Amount;       // Locked balance
+  f: Amount;        // Fee (gross: protocol fee + `bfa`), included in `a`
+  bfa?: Amount;     // Builder-fee portion of `f`, omitted when zero
+}
+```
+
+### AccountEventType
+
+| Value | Name                        |
+| ----- | --------------------------- |
+| 0     | Unspecified                 |
+| 1     | Deposit                     |
+| 2     | Withdrawal                  |
+| 3     | IncreasePositionCollateral  |
+| 4     | Settlement                  |
+| 5     | Liquidation                 |
+| 6     | TransferToProtocol          |
+| 7     | TransferFromProtocol        |
+| 8     | Funding                     |
+| 9     | Deleveraging                |
+| 10    | Unwinding                   |
+| 11    | PositionCollateralDecreased |
+| 12    | LastForwardedDescIdReset    |
+
+### AccountStats
+
+```typescript
+interface AccountStats {
+  mt: number;
+  in: InstanceID;
+  id: AccountID;
+  td: Amount;    // Total deposits (collateral token)
+  tw: Amount;    // Total withdrawals (collateral token)
+  tv: Amount;    // Total trading volume
+  tf: Amount;    // Total fees paid, including `tbf` — the full trading cost
+  tbf?: Amount;  // Builder-fee portion of `tf`, omitted when zero
+  trp: Amount;   // Total realized PnL (net of all fees, protocol and builder)
+  wr: number;    // Total win rate (bps)
+  tt: number;    // Total trades
+}
+```
+
+### Portfolio
+
+Equity or PnL of a wallet as a time series, served by [GET /api/v1/trading/portfolio/:kind/:period](/broken/pages/3ef674fd3bc6a5a9038554b57f0fb85f991387af#get-apiv1tradingportfoliokindperiod). Which of the two `chart` carries is set by the `kind` in the request — the shape is the same either way.
+
+```typescript
+interface Portfolio {
+  at: BlockTimestamp;   // Block/timestamp of the last update
+  chart: ChartPoint[];  // Chart points, older to newer
+}
+```
+
+### ChartPoint
+
+```typescript
+interface ChartPoint {
+  t: number;   // Timestamp (ms)
+  v: Amount;   // Value (collateral token)
+}
+```
+
+***
+
+## Market Data
+
+### L2PriceLevel
+
+```typescript
+interface L2PriceLevel {
+  p: Price;   // Price (scaled)
+  s: Size;    // Size (scaled)
+  o: number;  // Number of orders
+}
+```
+
+### L2Book
+
+```typescript
+interface L2Book {
+  mt: MessageType;      // 15 = snapshot, 16 = update
+  sn?: number;          // Block the book is current as of (REST snapshot)
+  sid?: number;         // Subscription ID (WebSocket)
+  at: BlockTimestamp;
+  bid: L2PriceLevel[];  // Bid levels, ordered away from the spread
+  ask: L2PriceLevel[];  // Ask levels, ordered away from the spread
+}
+```
+
+Snapshot and update are the same shape, distinguished by `mt`. On an **update** (`mt: 16`) a level with `o: 0` is a removal. The [REST endpoint](/broken/pages/3ef674fd3bc6a5a9038554b57f0fb85f991387af#get-apiv1market-datamarket_idbook) only ever answers a snapshot, at most 100 levels per side.
+
+### Trade
+
+```typescript
+interface Trade {
+  at: BlockTxLogTimestamp;
+  p: Price;
+  s: Size;
+  sd: TradeSide;  // 1=Buy, 2=Sell
+}
+```
+
+### Candle
+
+```typescript
+interface Candle {
+  t: number;    // Open timestamp (ms)
+  o: Price;     // Open
+  c: Price;     // Close
+  h: Price;     // High
+  l: Price;     // Low
+  v: Amount;    // Volume
+  n: number;    // Trade count
+}
+```
+
+***
+
+## Profile
+
+### RefCode
+
+```typescript
+interface RefCode {
+  code: string;
+  limit?: number;       // Max profiles that can use this code
+  used?: number;        // Profiles already created using this code
+  volume?: Amount;      // Total volume from referred profiles (excl. T2)
+  created_at: number;   // Ref code creation timestamp (ms)
+}
+```
+
+### Announcement
+
+```typescript
+interface Announcement {
+  id: number;
+  title: string;
+  content: string;
+}
+```
+
+***
+
+## API Keys
+
+Ed25519 per-request-signed API key authentication.
+
+### ScopeMask
+
+API key scope bitmask. `trade` implies `read`; withdrawals are never permitted via an API key.
+
+```typescript
+type ScopeMask = number;    // uint32 bitmask
+
+const ScopeRead: ScopeMask = 1 << 0;         // read account/order/position data
+const ScopeTrade: ScopeMask = 1 << 1;        // place/cancel/modify orders (implies read)
+const ScopeAll = ScopeRead | ScopeTrade;     // full scope
+```
+
+### ApiKeyPayloadRequest
+
+Requests the EIP-712 message to sign for enrolling an API key.
+
+```typescript
+interface ApiKeyPayloadRequest {
+  chain_id: number;
+  address: string;             // signer wallet (owner/operator)
+  public_key: string;          // Ed25519 public key (32 bytes)
+  scope_mask: ScopeMask;       // bitmask: 1=read, 2=trade
+  label: string;               // human-readable key label (mandatory)
+  expires_at?: number;         // Timestamp (ms), 0 = none
+  ip_cidrs?: string[];
+  target_profile?: string;     // Target delegated account, if applicable
+
+  // Builder codes only (see Integrations → Builder codes)
+  builder_id?: number;               // registered builder code, 1..255
+  max_builder_fee_per_100k?: number; // per-order fee ceiling, 1 = 0.1 bps
+}
+```
+
+### ApiKeyPayloadResponse
+
+```typescript
+interface ApiKeyPayloadResponse {
+  typed_data?: any;            // EIP-712 typed data
+  mac: string;
+}
+```
+
+### ApiKeyEnrollRequest
+
+Submits the signed enrollment payload; `pop_signature` is the mandatory Ed25519 proof-of-possession over the typed-data hash.
+
+```typescript
+interface ApiKeyEnrollRequest {
+  chain_id: number;
+  address: string;
+  typed_data?: any;            // EIP-712 typed data
+  mac: string;
+  signature: string;
+  pop_signature: string;
+  target_profile?: string;     // Target delegated account, if applicable
+}
+```
+
+### ApiKeyInfo
+
+Public, non-secret view of an enrolled key.
+
+```typescript
+interface ApiKeyInfo {
+  api_key: string;             // Opaque identifier sent in X-API-Key header
+  address: string;
+  scope_mask: ScopeMask;
+  label: string;
+  ip_cidrs: string[];
+  origin: string;              // HTTP Origin the key was enrolled from
+  expires_at: number;          // Timestamp (ms), 0 = none
+  last_used_at: number;        // Timestamp (ms), 0 = never
+  created_at: number;          // Timestamp (ms)
+
+  // Builder terms, present only on a builder-bound key
+  builder_id?: number;               // code the key submits under
+  builder_name?: string;             // registered display name; empty if the code is no
+                                     // longer registered — display `builder_id` instead
+  max_builder_fee_per_100k?: number; // enrolled ceiling, 1 = 0.1 bps
+  max_builder_fee_pct?: string;      // the same ceiling formatted, e.g. "0.100%"
+}
+```
+
+### ApiKeyEnrollResponse
+
+```typescript
+interface ApiKeyEnrollResponse {
+  api_key: ApiKeyInfo;
+}
+```
+
+### ApiKeySignInRequest
+
+First WebSocket frame for API-key authentication. Extends `MessageHeader`.
+
+```typescript
+interface ApiKeySignInRequest extends MessageHeader {
+  chain_id: number;
+  api_key: string;             // X-API-Key identifier issued at enrollment
+  timestamp: string;           // unix epoch milliseconds, decimal
+  nonce: string;               // client-random, base64url
+  signature: string;           // base64url(ed25519 signature)
+}
+```

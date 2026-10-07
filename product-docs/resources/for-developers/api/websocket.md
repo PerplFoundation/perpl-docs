@@ -71,6 +71,8 @@ interface MessageHeader {
 | 27    | PositionsUpdate      | Server → Client |
 | 28    | AccountStatsUpdate   | Server → Client |
 | 29    | ApiKeySignIn         | Client → Server |
+| 30    | BatchOrderRequest    | HTTP only       |
+| 31    | BatchStatusResponse  | HTTP only       |
 | 100   | Heartbeat            | Server → Client |
 
 > **Note:** Message types 4, 13, and 14 are reserved and not currently defined.
@@ -80,6 +82,8 @@ interface MessageHeader {
 ## Market Data WebSocket
 
 The market-data endpoint requires no authentication. Open the connection, then subscribe to one or more streams.
+
+Each connection supports **16 active subscriptions** and **10 subscription requests per minute**. Batch stream changes in one `mt: 5` frame. Exceeding the request rate closes the connection with `1008`. Exceeding the subscription cap rejects only that entry.
 
 ### Connecting
 
@@ -156,6 +160,8 @@ interface SubscriptionResponse {
   }>;
 }
 ```
+
+An entry can return `429` for too many subscriptions or `404` for an unknown stream. Check each entry. Existing subscriptions stay active.
 
 ### Order Book
 
@@ -244,6 +250,10 @@ interface MarketState {
 }
 ```
 
+`MarketConfigUpdate` (`mt: 8`) includes `MarketConfig`, including dynamic `order_ttl_blocks`. It does not include `order_max_neg_pnl_collat_bps`.
+
+The `funding@<chain_id>` stream emits two messages per funding interval. Use `feb` to associate each message with its interval.
+
 ### Heartbeat (`mt: 100`)
 
 The `heartbeat@<chain_id>` stream emits a continuously-increasing sequence number and the latest head block. Track `sn` to detect dropped messages.
@@ -321,6 +331,8 @@ ws.onopen = async () => {
 The signature timestamp must be within ±30 seconds of server time, and each nonce is single-use within the validity window. Generate a fresh `timestamp` and `nonce` for every sign-in — including on every reconnect.
 {% endhint %}
 
+Send `mt: 29` within five seconds on mainnet or ten seconds on testnet. Otherwise, the server closes the connection with `1008`.
+
 ### Initial Snapshots
 
 After successful authentication, the server pushes three snapshots:
@@ -346,6 +358,7 @@ interface OrderRequest {
   s: number;           // Size (scaled)
   a?: string;          // Amount (for collateral increase; decimal string)
   ms?: number;         // Maximum market order price slippage, bps
+  mnp?: number;        // Maximum negative-PnL collateralization, bps
   tif?: number;        // Time-in-force (also defined); order expiry/validity is governed by the lb field below
   fl: OrderFlags;      // Flags: GoodTillCancel (GTC), PostOnly, FillOrKill (FOK), ImmediateOrCancel (IOC)
   tp?: number;         // Trigger price (stop / take-profit orders)
@@ -357,6 +370,8 @@ interface OrderRequest {
   bf?: number;         // Builder fee (per_100k, 1 = 0.1 bps); builder-bound keys only — see Builder Codes
 }
 ```
+
+`mnp` accepts `0` through `65535`. Omitting it uses `order_max_neg_pnl_collat_bps`. An explicit `0` disallows this collateralization.
 
 > **Note:** `bf` charges your own fee on top of the protocol fee, attributed to your registered builder code and settled to you. It is only valid on a key that was enrolled bound to a builder code, and must not exceed the ceiling the user signed for. See [Builder Codes](builder-codes.md).
 
@@ -391,7 +406,9 @@ Deduplication rules:
 
 #### Trigger Orders
 
-* Trigger orders must set `lb: 0` (no expiry block). The server manages their lifecycle from the trigger condition.
+* `lb: 0` is valid for every order type and uses the market maximum window.
+* A non-zero `lb` must satisfy `head < lb <= head + order_ttl_blocks`. The server can clamp it.
+* For triggers, a non-zero `lb` is ignored after admission. Stale values still fail validation.
 * `tp` + `tpc`: the order is not posted until the market last price crosses the trigger price per the condition (GTE = greater-than-or-equal, LTE = less-than-or-equal).
 * `tr`: links this trigger to another request. When the linked request trades, the trigger activates; when it fails, the trigger is cancelled. If the linked request places an order, the trigger activates when that order fills and cancels when it is cancelled.
 * `lp`: links the trigger to a position. The trigger is cancelled when the position is closed or inverted.
@@ -483,17 +500,17 @@ interface StatusResponse {
 
 **Rejection reasons** (non-zero `code`):
 
-| `error` | Condition | `code` |
-|---|---|---|
-| `order already expired` | `tif > 0 && tif <= head` | 400 |
-| `last exec block already expired` | `lb > 0 && lb <= head` | 400 |
-| `last exec block too high` | `tp == 0 && lb > head + order_ttl_blocks` | 400 |
-| `trigger price condition is not specified` | `tp > 0 && tpc == 0` | 400 |
-| `order type is not provided` / `invalid order type` | invalid `t` | 400 |
-| `builder fee not permitted for this api key` | `bf` above the key's ceiling, or any `bf` on a non-builder key | 400 |
-| `api key lacks trade scope` | read-scoped key | 403 |
+| `error`                                             | Condition                                                      | `code` |
+| --------------------------------------------------- | -------------------------------------------------------------- | ------ |
+| `order already expired`                             | `tif > 0 && tif <= head`                                       | 400    |
+| `last exec block already expired`                   | `lb > 0 && lb <= head`                                         | 400    |
+| `last exec block too high`                          | `tp == 0 && lb > head + order_ttl_blocks`                      | 400    |
+| `trigger price condition is not specified`          | `tp > 0 && tpc == 0`                                           | 400    |
+| `order type is not provided` / `invalid order type` | invalid `t`                                                    | 400    |
+| `builder fee not permitted for this api key`        | `bf` above the key's ceiling, or any `bf` on a non-builder key | 400    |
+| `api key lacks trade scope`                         | read-scoped key                                                | 403    |
 
-**Failures that close the connection instead:** an unknown `mkt`, an `acc` not owned by the connected wallet, and any frame that fails to parse produce no `mt: 3` at all — the server closes with code `1011` (`failed to process`). Do not wait on a status that will never arrive; treat an unexpected close as a failure of every request still in flight (see [Error Handling and Reconnection](#error-handling-and-reconnection)).
+**Failures that close the connection instead:** an unknown `mkt`, an `acc` not owned by the connected wallet, and any frame that fails to parse produce no `mt: 3` at all — the server closes with code `1011` (`failed to process`). Do not wait on a status that will never arrive; treat an unexpected close as a failure of every request still in flight (see [Error Handling and Reconnection](websocket.md#error-handling-and-reconnection)).
 
 > **Note:** `mt: 3` reports admission only; everything after arrives on `mt: 24`. `sr: 14` (`ExceedsLastExecutionBlock`) can be produced without any transaction reaching the chain — do not treat it as evidence a transaction was submitted.
 
@@ -507,7 +524,7 @@ interface WalletOrders {
 }
 ```
 
-Orders with `r: true` should be removed from your open-orders view. Order-level status is carried in `st` (OrderStatus) and reject reasons in `sr` (OrderStatusReason — see [Order Reject Reasons](websocket.md#order-reject-reasons)).
+Orders with `r: true` should be removed from your open-orders view. Order-level status is carried in `st` (OrderStatus) and reject reasons in `sr` (OrderStatusReason — see [Order Reject Reasons](websocket.md#order-reject-reasons)). `fr` is an optional exchange-level failure reason. It accompanies relevant `sr` values, including `23`, `36`, and `44`.
 
 **OrderStatus (`st`)**:
 
@@ -559,12 +576,15 @@ interface Account {
   id: number;       // Account ID
   fr: boolean;      // Is frozen
   fw: boolean;      // Allows forwarding
+  ft: number;       // Fee-tier index
   lfr: number;      // Last forwarded request ID (use to seed `rq` generation)
   b: string;        // Balance (decimal string)
   lb: string;       // Locked balance (decimal string)
   h?: AccountEvent[];  // Recent events
 }
 ```
+
+Orders require `fw: true`. If forwarding is disabled, they fail with `st: 7` and `sr: 34` (`OrderForwardingNotAllowed`) without a chain transaction. Refresh account state after `mt: 21` updates because `fw` can change.
 
 `AccountEvent` entries carry an `AccountEventType`:
 
@@ -635,9 +655,13 @@ setInterval(() => {
 
 The server replies with a Pong (`mt: 2`).
 
+Market-data connections do not need application pings. Pings count against the subscription-request budget.
+
 ***
 
 ## Error Handling and Reconnection
+
+Close code `1008` indicates rate, connection, ping, or sign-in timeout limits. `1011` indicates a processing failure. `1013` indicates a slow consumer or send-buffer overflow; process queued frames before reconnecting. `1001` indicates server shutdown.
 
 ### Close Code 3401 — Authentication Failure
 

@@ -78,10 +78,10 @@ Leverage in an `OrderRequest` and on `Order` / `Position` objects is in hundredt
 
 Integrations that route flow under a registered [builder code](builder-codes.md) charge a builder fee on top of the protocol fee. Two extra fields report it, both **omitted when zero** (so an ordinary account never sees them):
 
-| Field | On | Meaning |
-|---|---|---|
+| Field | On                              | Meaning                                                                |
+| ----- | ------------------------------- | ---------------------------------------------------------------------- |
 | `bfa` | `Fill`, `Order`, `AccountEvent` | Builder-fee portion of that event's `f` (fee), in the same unit as `f` |
-| `tbf` | `AccountStats` | Lifetime builder fees, already included in `tf` (total fees) |
+| `tbf` | `AccountStats`                  | Lifetime builder fees, already included in `tf` (total fees)           |
 
 Fees are reported **gross** — `f` (and `tf`) already include the builder portion, so never add `bfa` to `f` (or `tbf` to `tf`). The per-order builder fee itself is set in `per_100k` units, **not** micros; see [Builder Codes → Fee units](builder-codes.md#fee-units).
 
@@ -264,6 +264,7 @@ The `sr` field — the reason an order reached its current status. This is the p
 | 66    | TriggeredOrderPartiallyFilled           |
 | 67    | TriggeredOrderExpired                   |
 | 68    | TriggeredOrderRecoverableFailure        |
+| 69    | OrderExtensionRejected                  |
 
 ### LiquiditySide
 
@@ -274,6 +275,23 @@ The `l` field on fills — whether your order provided liquidity (maker) or remo
 | 0     | Unspecified |
 | 1     | Maker       |
 | 2     | Taker       |
+
+### OrderFailureReason
+
+The optional `fr` field adds exchange-level detail when `sr` is `23`, `36`, or `44`.
+
+| Value | Name                           |
+| ----- | ------------------------------ |
+| 0     | Unspecified                    |
+| 1     | InsufficientBalance            |
+| 2     | InsufficientCollateralIncrease |
+| 3     | InsufficientCollateralInvert   |
+| 4     | NoPositionToClose              |
+| 5     | PerpetualSolvency              |
+| 6     | NegativePositionValue          |
+| 7     | ReferencePriceStale            |
+| 8     | ExceedsMaxNegPnlCollat         |
+| 9     | Other                          |
 
 ## Position enums
 
@@ -381,6 +399,7 @@ The API conveys errors through **HTTP status codes** on the REST channel, a **cl
 | 403  | Forbidden             | Scope insufficient (e.g. a `read`-scoped key attempting to place an order)                      |
 | 404  | Not Found             | Resource missing, or no on-chain account exists yet                                             |
 | 429  | Too Many Requests     | Rate limit exceeded — see [Rate limits](types-and-errors.md#rate-limits)                        |
+| 503  | Service Unavailable   | Service is catching up with chain state                                                         |
 | 500  | Internal Server Error | Server-side failure                                                                             |
 
 ### Enrollment status codes
@@ -393,10 +412,14 @@ The two API-key enrollment endpoints (`POST /api/v1/api-key/payload`, `POST /api
 | 409  | Public key already registered — revoked keys are **not** re-enrollable; generate a fresh key pair |
 | 423  | Per-profile key limit reached (**maximum 16 active keys**)                                        |
 
-### WebSocket close code
+### WebSocket close codes
 
 | Code | Meaning                | Handling                                                             |
 | ---- | ---------------------- | -------------------------------------------------------------------- |
+| 1001 | Server shutdown        | Reconnect with backoff                                               |
+| 1008 | Policy violation       | Check rate, connection, ping, and sign-in deadlines                  |
+| 1011 | Processing failure     | Treat in-flight requests as failed                                   |
+| 1013 | Send-buffer overflow   | Process queued frames before reconnecting                            |
 | 3401 | Authentication failure | Re-send a fresh signed `ApiKeySignIn` (`mt: 29`) frame and reconnect |
 
 {% hint style="warning" %}

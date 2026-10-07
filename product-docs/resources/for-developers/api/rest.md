@@ -72,6 +72,8 @@ interface Context {
 
 Each `ProtocolInstance` carries operational limits such as `min_account_open_amount`, `min_deposit_amount`, `min_withdraw_amount`, and `max_account_trigger_orders`. Each `Market` carries `price_decimals` and `size_decimals`, which you use to scale integer prices and sizes into human-readable values (see [Types](types-and-errors.md)).
 
+Each market configuration also includes the per-tier `maker_fees` and `taker_fees`.
+
 **Example**:
 
 ```bash
@@ -133,6 +135,26 @@ FROM=$(($(date +%s) * 1000 - 86400000))
 TO=$(($(date +%s) * 1000))
 curl "${API_URL}/v1/market-data/1/candles/3600/${FROM}-${TO}"
 ```
+
+A market without candles returns an empty `d` array.
+
+***
+
+### Additional market-data endpoints
+
+| Endpoint                                               | Authentication | Returns                                       |
+| ------------------------------------------------------ | -------------- | --------------------------------------------- |
+| `GET /api/v1/market-data/:market_id/funding/:from-:to` | None           | `FundingSeries` for one market, oldest first  |
+| `GET /api/v1/market-data/funding/:from-:to`            | None           | `MarketFundingSeries`, keyed by market ID     |
+| `GET /api/v1/market-data/:market_id/book?levels=1-100` | None           | `L2Book` snapshot                             |
+| `GET /api/v1/market-data/:market_id/ticker`            | None           | A one-market `MarketStateUpdate` map          |
+| `GET /api/v1/market-data/ticker`                       | None           | `MarketStateUpdate` for all available markets |
+
+Funding range bounds are inclusive and use the event's applied timestamp. A market request supports up to **1,024** funding intervals. The all-market request supports up to **128** intervals of the shortest market interval.
+
+`book` accepts an integer `levels` value from `1` through `100`. Unknown markets and invalid depth return `400`. A book or ticker unavailable during service startup returns `503`.
+
+`ticker` responses use `mt: 9`, `sn`, and `d`, where `d` is keyed by market ID. Markets without available state are omitted. The all-market endpoint returns `503` when no market state exists.
 
 ***
 
@@ -334,9 +356,53 @@ interface Fill {
   l: LiquiditySide; // Maker=1, Taker=2
   p?: number;       // Fill price (scaled)
   s: number;        // Filled size (scaled)
-  f: string;        // Fee/rebate
+  f: string;        // Gross protocol and builder fee
+  bfa?: string;     // Builder-fee component, omitted when zero
 }
 ```
+
+***
+
+## Trading state and order submission
+
+### GET /api/v1/trading/orders
+
+Returns a `WalletOrders` snapshot (`mt: 23`) containing open `Order` values.
+
+### GET /api/v1/trading/positions
+
+Returns a `WalletPositions` snapshot (`mt: 26`) containing open `Position` values.
+
+### GET /api/v1/trading/wallet
+
+Returns a `Wallet` snapshot (`mt: 19`) with `addr`, `n`, `fl`, `as`, and `sts`.
+
+All three endpoints require an API-key signature. They return `404` when the wallet has no exchange account.
+
+### POST /api/v1/trading/orders
+
+Submits one through 100 orders in a `BatchOrderRequest`. This endpoint requires an API key with the `trade` scope.
+
+```typescript
+interface BatchOrderRequest {
+  mt?: 30;
+  sn?: number;
+  d: OrderSpec[];
+}
+
+interface BatchStatusResponse {
+  mt: 31;
+  cid?: number;
+  status: Status;
+  statuses?: Status[];
+}
+```
+
+Check every `statuses` entry. A `200` response only confirms evaluation. Per-order codes are `0`, `400`, `403`, `429`, or `503`.
+
+### GET /api/v1/trading/portfolio/:kind/:period
+
+Returns a wallet `Portfolio` time series. `kind` is `equity` or `pnl`. `period` is `all`, `day`, `2weeks`, `week`, or `month`.
 
 ***
 
@@ -429,6 +495,7 @@ On a `429 Too Many Requests`, retry with exponential backoff (for example 1s, th
 | `403` | Forbidden — insufficient scope (for example a `read` key attempting a trade action) |
 | `404` | Not Found — including no on-chain account for the caller                            |
 | `429` | Too Many Requests                                                                   |
+| `503` | Service Unavailable — the service is catching up with chain state                   |
 | `500` | Internal Server Error                                                               |
 
 A request is rejected with `401` if the timestamp is outside the ±30-second window, the nonce has already been used within the validity window, the key is past its `expires_at`, or the caller IP is not in the key's `ip_cidrs` allow-list (CIDR = Classless Inter-Domain Routing; maximum 4 CIDRs) when one is set.
