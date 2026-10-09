@@ -26,7 +26,12 @@ Your liquidation point is set by each market's **maintenance margin** — the mi
 | SOL    | 5%                 | 12x              |
 | MON    | 5%                 | 10x              |
 | HYPE   | 5%                 | 10x              |
-| ZEC    | ~6.7%              | 8x               |
+| ZEC    | ~5.6%              | 10x              |
+| LIT    | 10%                | 3x               |
+| VVV    | 10%                | 3x               |
+| PUMP   | 10%                | 5x               |
+| NEAR   | 10%                | 3x               |
+| UNI    | 10%                | 3x               |
 
 A 4% maintenance margin means a position is liquidated once its remaining margin falls to 4% of the position's value. Maximum leverage shown is the base maximum; initial margin requirements are dynamic and can rise — lowering the effective maximum — for larger positions or in volatile conditions (see [Margin](../margin.md)).
 

@@ -80,7 +80,7 @@ export const privateKey = Buffer.from(
 );
 
 // Market IDs for mainnet.
-// Testnet uses different IDs (BTC=16, ETH=32, SOL=48, MON=64, ZEC=256).
+// Testnet uses different IDs (BTC=16, ETH=32, SOL=48, MON=64, ZEC=256, LIT=272, PUMP=320, NEAR=336).
 export const MARKETS = {
   BTC: 1,
   MON: 10,
@@ -88,6 +88,11 @@ export const MARKETS = {
   SOL: 31,
   HYPE: 40,
   ZEC: 50,
+  LIT: 60,
+  VVV: 70,
+  PUMP: 90,
+  NEAR: 100,
+  UNI: 110,
 } as const;
 ```
 

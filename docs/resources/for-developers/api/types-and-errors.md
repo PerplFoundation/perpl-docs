@@ -126,6 +126,8 @@ Market IDs differ per network. Use `GET /api/v1/pub/context` to fetch the live l
 | LIT    | `60`       | `272`      |
 | VVV    | `70`       | —          |
 | PUMP   | `90`       | `320`      |
+| NEAR   | `100`      | `336`      |
+| UNI    | `110`      | —          |
 
 {% hint style="info" %}
 For the full network reference (RPC URLs, chain IDs, contract addresses, collateral token) see [Networks](../networks-and-configuration.md).

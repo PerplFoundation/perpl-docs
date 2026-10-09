@@ -21,7 +21,7 @@ export PERPL_API_URL="https://app.perpl.xyz/api"    # mainnet
 ```
 
 {% hint style="info" %}
-Market IDs differ per network. Mainnet: BTC=1, MON=10, ETH=20, SOL=31, HYPE=40, ZEC=50. Testnet: BTC=16, ETH=32, SOL=48, MON=64, ZEC=256. For the full list of network values (RPC URLs, contract addresses, collateral token) see [Networks](../networks-and-configuration.md).
+Market IDs differ per network. Mainnet: BTC=1, MON=10, ETH=20, SOL=31, HYPE=40, ZEC=50, LIT=60, VVV=70, PUMP=90, NEAR=100, UNI=110. Testnet: BTC=16, ETH=32, SOL=48, MON=64, ZEC=256, LIT=272, PUMP=320, NEAR=336. For the full list of network values (RPC URLs, contract addresses, collateral token) see [Networks](../networks-and-configuration.md).
 {% endhint %}
 
 ## Authentication overview
