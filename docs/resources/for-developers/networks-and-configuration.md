@@ -164,17 +164,23 @@ The `dex-sdk` `Chain` type carries the full per-network configuration. Use the b
 ```rust
 use perpl_sdk::Chain;
 
-// Mainnet: chain_id 143, Exchange 0x34B6...12a6F, perpetuals [1, 10, 20, 31, 40, 50]
+// Mainnet: chain_id 143, Exchange 0x34B6...12a6F
+// Tracks every listed perpetual, discovered on-chain, except the legacy SOL market 30
 let chain = Chain::mainnet();
 
-// Testnet: chain_id 10143, Exchange 0x1964...80cc, perpetuals [16, 32, 48, 64, 256]
+// Testnet: chain_id 10143, Exchange 0x1964...80cc
+// Tracks every listed perpetual, discovered on-chain
 let chain = Chain::testnet();
+
+// Track only a subset of markets instead
+let chain = Chain::mainnet().with_perpetuals(vec![1, 20]);
 
 // Read individual fields
 let id: u64 = chain.chain_id();
 let exchange = chain.exchange();
 let collateral = chain.collateral_token();
-let markets = chain.perpetuals();          // &[PerpetualId]
+let markets = chain.perpetuals();             // &[PerpetualId]; empty = every listed perpetual
+let excluded = chain.excluded_perpetuals();   // &[PerpetualId]; never tracked
 let deploy_block = chain.deployed_at_block();
 ```
 
@@ -189,8 +195,17 @@ let chain = Chain::custom(
     /* collateral_token   */ address!("0x0000000000000000000000000000000000000000"),
     /* deployed_at_block  */ 0,
     /* exchange           */ address!("0x0000000000000000000000000000000000000000"),
-    /* perpetuals         */ vec![],
+    /* perpetuals         */ vec![], // empty = every listed perpetual
 );
+```
+
+To get the IDs of every perpetual currently listed on a network, ask the exchange directly:
+
+```rust
+use alloy::eips::BlockId;
+use perpl_sdk::state::listed_perpetuals;
+
+let listed = listed_perpetuals(&chain, provider.clone(), BlockId::safe()).await?;
 ```
 
 {% hint style="info" %}

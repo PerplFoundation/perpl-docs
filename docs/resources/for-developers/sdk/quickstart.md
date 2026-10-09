@@ -64,7 +64,7 @@ Chain  ──►  SnapshotBuilder  ──► Exchange (in-memory cache)
 
 ## 1. Pick a chain
 
-The `Chain` type carries the full per-network configuration — chain ID, collateral token, Exchange contract address, the block the Exchange was deployed at, and the list of listed perpetual (market) IDs. Use a built-in constructor:
+The `Chain` type carries the full per-network configuration — chain ID, collateral token, Exchange contract address, the block the Exchange was deployed at, and which perpetual (market) IDs to track. You do not need to list markets: by default the SDK tracks **every perpetual listed on the exchange**, discovered on-chain when you build a snapshot, so newly listed markets are picked up without an SDK update. Use a built-in constructor:
 
 ```rust
 use perpl_sdk::Chain;
@@ -73,23 +73,40 @@ let chain = Chain::testnet();   // recommended for development
 // let chain = Chain::mainnet(); // live trading
 ```
 
-| Constructor        | Chain ID | Exchange contract                            | Collateral token                             | Deploy block | Perpetual IDs             |
-| ------------------ | -------- | -------------------------------------------- | -------------------------------------------- | ------------ | ------------------------- |
-| `Chain::mainnet()` | `143`    | `0x34B6552d57a35a1D042CcAe1951BD1C370112a6F` | `0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a` | `54773010`   | `[1, 10, 20, 31, 40, 50]` |
-| `Chain::testnet()` | `10143`  | `0x1964C32f0bE608E7D29302AFF5E61268E72080cc` | `0xa9012a055bd4e0eDfF8Ce09f960291C09D5322dC` | `62953`      | `[16, 32, 48, 64, 256]`   |
+| Constructor        | Chain ID | Exchange contract                            | Collateral token                             | Deploy block | Perpetuals tracked                                    |
+| ------------------ | -------- | -------------------------------------------- | -------------------------------------------- | ------------ | ----------------------------------------------------- |
+| `Chain::mainnet()` | `143`    | `0x34B6552d57a35a1D042CcAe1951BD1C370112a6F` | `0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a` | `54773010`   | Every listed perpetual except the legacy SOL market `30` |
+| `Chain::testnet()` | `10143`  | `0x1964C32f0bE608E7D29302AFF5E61268E72080cc` | `0xa9012a055bd4e0eDfF8Ce09f960291C09D5322dC` | `62953`      | Every listed perpetual                                |
 
 {% hint style="info" %}
-On mainnet, SOL is perpetual ID `31` (not `30`). Perpetual IDs are network-specific — the same asset has a different ID on testnet. See [Networks & Configuration](../networks-and-configuration.md) for the full market tables.
+On mainnet, SOL is perpetual ID `31` (not `30`); `Chain::mainnet()` excludes `30` by default. Perpetual IDs are network-specific — the same asset has a different ID on testnet. See [Networks & Configuration](../networks-and-configuration.md) for the full market tables.
 {% endhint %}
 
 Read individual fields with the getters:
 
 ```rust
 let id: u64           = chain.chain_id();
-let exchange          = chain.exchange();           // Address
-let collateral        = chain.collateral_token();   // Address
-let markets           = chain.perpetuals();         // &[PerpetualId]
+let exchange          = chain.exchange();             // Address
+let collateral        = chain.collateral_token();     // Address
+let markets           = chain.perpetuals();           // &[PerpetualId]; empty = every listed perpetual
+let excluded          = chain.excluded_perpetuals();  // &[PerpetualId]; never tracked
 let deploy_block: u64 = chain.deployed_at_block();
+```
+
+To track a subset, or to change the exclusions, derive a new `Chain`:
+
+```rust
+let chain = Chain::mainnet().with_perpetuals(vec![1, 20]);       // only BTC and ETH
+let chain = Chain::mainnet().with_excluded_perpetuals(vec![]);   // also track legacy SOL 30
+```
+
+To get the IDs of every perpetual listed right now, ask the exchange:
+
+```rust
+use alloy::eips::BlockId;
+use perpl_sdk::state::listed_perpetuals;
+
+let listed = listed_perpetuals(&chain, provider.clone(), BlockId::safe()).await?;
 ```
 
 For a non-standard deployment (for example a local `anvil` node), build one explicitly:
@@ -103,9 +120,11 @@ let chain = Chain::custom(
     /* collateral_token  */ address!("0x0000000000000000000000000000000000000000"),
     /* deployed_at_block */ 0,
     /* exchange          */ address!("0x0000000000000000000000000000000000000000"),
-    /* perpetuals        */ vec![],
+    /* perpetuals        */ vec![], // empty = every listed perpetual
 );
 ```
+
+A custom chain starts with no exclusions.
 
 ## 2. Build a state snapshot
 
@@ -124,13 +143,13 @@ Builder options:
 
 | Method                                                       | Purpose                                                                               |
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
-| `.at_block(BlockId)`                                         | Snapshot state as of a specific block instead of the latest.                          |
-| `.with_perpetuals(Vec<PerpetualId>)`                         | Restrict the snapshot to these markets.                                               |
+| `.at_block(BlockId)`                                         | Snapshot state as of a specific block instead of the latest safe block (the default). |
+| `.with_perpetuals(Vec<PerpetualId>)`                         | Restrict the snapshot to these markets (default: every listed perpetual).             |
 | `.with_accounts(Vec<AccountId>)`                             | Load only these accounts' positions. Mutually exclusive with `.with_all_positions()`. |
 | `.with_all_positions()`                                      | Load positions for every account. Mutually exclusive with `.with_accounts(...)`.      |
 | `.with_orders_per_batch(n)` / `.with_positions_per_batch(n)` | Tune multicall batch sizes (default `1000`).                                          |
 
-Under the hood, `build()` normalizes the target block to a concrete number, probes the Exchange for `getPerpetualInfoV2` support (falling back to the V0 layout, defaulting the V2-only `fundingSumScalingExp` / `priceResiduePNSQ16` fields to `0`), fetches global and per-perpetual parameters, fees, and margins, then reads resting orders (order-ID bitmap → batched `getOrder` multicalls, preserving first-in-first-out (FIFO) order) and positions. The default batch size of `1000` is tuned for Monad's per-slot gas cost and the 30M-gas `eth_call` limit.
+Under the hood, `build()` normalizes the target block to a concrete number, resolves which markets to load (when none were named, it reads the exchange's list of listed perpetuals and drops the chain's exclusions), probes the Exchange for `getPerpetualInfoV2` support (falling back to the V0 layout, defaulting the V2-only `fundingSumScalingExp` / `priceResiduePNSQ16` fields to `0`), fetches global and per-perpetual parameters, fees, and margins, then reads resting orders (order-ID bitmap → batched `getOrder` multicalls, preserving first-in-first-out (FIFO) order) and positions. The default batch size of `1000` is tuned for Monad's per-slot gas cost and the 30M-gas `eth_call` limit.
 
 The returned `Exchange` exposes the cached state:
 
@@ -197,6 +216,7 @@ This is a complete, runnable `main.rs` modeled on the SDK's `print_book` utility
 use std::time::Duration;
 
 use alloy::{
+    eips::BlockId,
     providers::ProviderBuilder,
     rpc::client::RpcClient,
     transports::layers::RetryBackoffLayer,
@@ -204,7 +224,7 @@ use alloy::{
 use futures::StreamExt;
 use perpl_sdk::{
     Chain,
-    state::{OrderBook, Perpetual, SnapshotBuilder},
+    state::{OrderBook, Perpetual, SnapshotBuilder, listed_perpetuals},
     stream,
     types::{PerpetualId, StateInstant},
 };
@@ -215,16 +235,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let market: PerpetualId = 16; // testnet BTC
     let rpc_url = "https://testnet-rpc.monad.xyz";
 
-    // Guard: make sure the market is listed on this chain.
-    if !chain.perpetuals().contains(&market) {
-        eprintln!(
-            "market {} not on this chain; available: {:?}",
-            market,
-            chain.perpetuals(),
-        );
-        std::process::exit(1);
-    }
-
     // Build an RPC client with a retry/backoff layer and a poll interval.
     let client = RpcClient::builder()
         .layer(RetryBackoffLayer::new(10, 100, 200))
@@ -232,6 +242,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await?;
     client.set_poll_interval(Duration::from_millis(500));
     let provider = ProviderBuilder::new().connect_client(client);
+
+    // Guard: make sure the market is listed on this chain. The exchange
+    // reports its own listings, so ask it rather than hard-coding a list.
+    let listed = listed_perpetuals(&chain, provider.clone(), BlockId::safe()).await?;
+    if !listed.contains(&market) {
+        eprintln!("market {} not on this chain; listed: {:?}", market, listed);
+        std::process::exit(1);
+    }
 
     // 1. Initial snapshot for the one market we care about.
     let mut exchange = SnapshotBuilder::new(&chain, provider.clone())
