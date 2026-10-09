@@ -138,7 +138,7 @@ Requirements: **Rust `>= 1.85.0`** (edition 2024). Add the SDK as a path depende
 perpl-sdk = { path = "../dex-sdk/crates/sdk" }
 ```
 
-The `Chain` type carries the per-network configuration (chain ID, Exchange address, collateral token, and the active perpetual list). Built-in constructors cover both networks:
+The `Chain` type carries the per-network configuration (chain ID, Exchange address, collateral token, and which perpetuals to track — by default, every perpetual listed on the exchange, discovered on-chain). Built-in constructors cover both networks:
 
 ```rust
 use perpl_sdk::Chain;
@@ -148,7 +148,7 @@ let chain = Chain::mainnet(); // or Chain::testnet()
 println!("chain_id      = {}", chain.chain_id());       // 143
 println!("exchange      = {}", chain.exchange());       // 0x34B6…12a6F
 println!("collateral    = {}", chain.collateral_token());
-println!("perpetuals    = {:?}", chain.perpetuals());   // [1, 10, 20, 31, 40, 50]
+println!("perpetuals    = {:?}", chain.perpetuals());   // [] — empty means every listed perpetual
 ```
 
 To browse the generated API reference:

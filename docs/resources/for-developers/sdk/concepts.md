@@ -65,11 +65,14 @@ pub struct Chain {
     collateral_token: Address,
     deployed_at_block: u64,
     exchange: Address,
-    perpetuals: Vec<PerpetualId>, // PerpetualId = u32
+    perpetuals: Vec<PerpetualId>,          // PerpetualId = u32; empty = every listed perpetual
+    excluded_perpetuals: Vec<PerpetualId>, // never tracked
 }
 ```
 
-Getters: `chain_id()`, `collateral_token()`, `deployed_at_block()`, `exchange()`, and `perpetuals() -> &[PerpetualId]`.
+Getters: `chain_id()`, `collateral_token()`, `deployed_at_block()`, `exchange()`, `perpetuals() -> &[PerpetualId]`, and `excluded_perpetuals() -> &[PerpetualId]`.
+
+An empty `perpetuals` list is the default and means **every perpetual listed on the exchange**: the exchange reports its own listings, so `SnapshotBuilder` discovers them on-chain at snapshot time and a newly listed market needs no SDK update. Set the list only to track a subset — `chain.with_perpetuals(vec![...])`. `chain.with_excluded_perpetuals(vec![...])` replaces the exclusion list; an excluded perpetual is left out of discovery and of later indexing, but fills and liquidations on it still update the balances of the accounts involved.
 
 ### Built-in constructors
 
@@ -86,11 +89,14 @@ let testnet = Chain::testnet();
 | `collateral_token`  | `0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a` | `0xa9012a055bd4e0eDfF8Ce09f960291C09D5322dC` |
 | `deployed_at_block` | `54773010`                                   | `62953`                                      |
 | `exchange`          | `0x34B6552d57a35a1D042CcAe1951BD1C370112a6F` | `0x1964C32f0bE608E7D29302AFF5E61268E72080cc` |
-| `perpetuals`        | `[1, 10, 20, 31, 40, 50]`                    | `[16, 32, 48, 64, 256]`                      |
+| `perpetuals`          | `[]` (every listed perpetual)                | `[]` (every listed perpetual)                |
+| `excluded_perpetuals` | `[30]`                                       | `[]`                                         |
 
 {% hint style="info" %}
-On mainnet, SOL is perpetual **31** (SOL was relisted as perp 31), not 30. Always disambiguate the perpetual id from the market symbol.
+On mainnet, SOL is perpetual **31** (SOL was relisted as perp 31), not 30, and `Chain::mainnet()` excludes the legacy `30` by default. Always disambiguate the perpetual id from the market symbol.
 {% endhint %}
+
+To list the perpetuals currently on the exchange, call `perpl_sdk::state::listed_perpetuals(&chain, provider, block_id)`.
 
 ### Custom deployments
 
@@ -105,9 +111,11 @@ let chain = Chain::custom(
     collateral_token,  // Address
     deployed_at_block, // u64
     exchange,          // Address
-    perpetuals,        // Vec<PerpetualId>
+    perpetuals,        // Vec<PerpetualId>; empty = every listed perpetual
 );
 ```
+
+A custom chain starts with no exclusions.
 
 ***
 
@@ -159,7 +167,7 @@ You rarely call this directly for orders — `OrderRequest::prepare` looks up th
 
 ### Step 1 — build the snapshot with `SnapshotBuilder`
 
-`SnapshotBuilder::new(chain: &Chain, provider)` starts a chainable builder. The provider is any `alloy` provider that is `Provider + Clone`. Defaults: block = latest, perpetuals = all of `chain.perpetuals()`, no accounts, all-positions off, and batch sizes of **1000**.
+`SnapshotBuilder::new(chain: &Chain, provider)` starts a chainable builder. The provider is any `alloy` provider that is `Provider + Clone`. Defaults: block = the latest safe block, perpetuals = `chain.perpetuals()` (when that is empty, every listed perpetual, discovered on-chain), no accounts, all-positions off, and batch sizes of **1000**.
 
 ```rust
 use perpl_sdk::{Chain, state::SnapshotBuilder};
