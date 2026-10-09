@@ -33,6 +33,11 @@ Each tradable perp is identified by a numeric `market_id`. **Market IDs differ b
 | 31          | SOL    |
 | 40          | HYPE   |
 | 50          | ZEC    |
+| 60          | LIT    |
+| 70          | VVV    |
+| 90          | PUMP   |
+| 100         | NEAR   |
+| 110         | UNI    |
 
 **Testnet** (Chain ID `10143`):
 
@@ -43,6 +48,9 @@ Each tradable perp is identified by a numeric `market_id`. **Market IDs differ b
 | 48          | SOL    |
 | 64          | MON    |
 | 256         | ZEC    |
+| 272         | LIT    |
+| 320         | PUMP   |
+| 336         | NEAR   |
 
 > **Note:** On mainnet, SOL was relisted as perp **31** on 2026-07-06. The legacy SOL perp **30** only appears in historical / on-chain data during migration — use **31** for the active SOL market.
 

@@ -16,6 +16,11 @@ Every order must be for at least **one size unit** of the market — the smalles
 | MON    | 1 MON                       | under a dollar |
 | HYPE   | 0.01 HYPE                   | under a dollar |
 | ZEC    | 0.0001 ZEC                  | under a dollar |
+| LIT    | 0.1 LIT                     | under a dollar |
+| VVV    | 0.01 VVV                    | under a dollar |
+| PUMP   | 1 PUMP                      | under a dollar |
+| NEAR   | 0.01 NEAR                   | under a dollar |
+| UNI    | 0.01 UNI                    | under a dollar |
 
 One size unit is 1 divided by the market's size scale. "Roughly worth" is indicative and moves with price.
 

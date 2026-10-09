@@ -121,6 +121,11 @@ Each market is identified by a numeric `market_id` (also called a perpetual ID o
 | 31          | SOL    |
 | 40          | HYPE   |
 | 50          | ZEC    |
+| 60          | LIT    |
+| 70          | VVV    |
+| 90          | PUMP   |
+| 100         | NEAR   |
+| 110         | UNI    |
 
 {% hint style="info" %}
 SOL was relisted on 2026-07-06. The active SOL market is `market_id = 31`. The legacy SOL market (`market_id = 30`) only appears in historical / on-chain data from the migration window; use `31` for all new integrations.
@@ -135,6 +140,9 @@ SOL was relisted on 2026-07-06. The active SOL market is `market_id = 31`. The l
 | 48          | SOL    |
 | 64          | MON    |
 | 256         | ZEC    |
+| 272         | LIT    |
+| 320         | PUMP   |
+| 336         | NEAR   |
 
 {% hint style="info" %}
 The market list can change as markets are added or delisted. Fetch the authoritative, current list at runtime from `GET /api/v1/pub/context` (see below) rather than relying on this table alone.

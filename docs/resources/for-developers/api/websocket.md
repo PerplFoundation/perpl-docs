@@ -105,7 +105,7 @@ Streams are identified by a string of the form `<name>@<key>`. Chain-scoped stre
 
 **Chain ID**: from `PERPL_CHAIN_ID` (default `143`, Monad Mainnet; `10143` on testnet).
 
-**Market IDs** (mainnet): BTC=`1`, MON=`10`, ETH=`20`, SOL=`31`, HYPE=`40`, ZEC=`50`. (testnet): BTC=`16`, ETH=`32`, SOL=`48`, MON=`64`, ZEC=`256`.
+**Market IDs** (mainnet): BTC=`1`, MON=`10`, ETH=`20`, SOL=`31`, HYPE=`40`, ZEC=`50`, LIT=`60`, VVV=`70`, PUMP=`90`, NEAR=`100`, UNI=`110`. (testnet): BTC=`16`, ETH=`32`, SOL=`48`, MON=`64`, ZEC=`256`, LIT=`272`, PUMP=`320`, NEAR=`336`.
 
 **Candle resolutions** (seconds): `60`, `300`, `900`, `1800`, `3600`, `7200`, `14400`, `28800`, `43200`, `86400`.
 
