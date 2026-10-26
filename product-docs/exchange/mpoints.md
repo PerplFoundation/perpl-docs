@@ -2,7 +2,7 @@
 
 #### Update: campaign extended by 3 weeks.&#x20;
 
-We hit every rewards milestone, so the full $1,000,000 pool is unlocked. To put the remaining $179,000 to use, weekly trading rewards will run for 3 additional weeks (19 weeks in total), alongside a final tournament. MON rewards will be distributed within one week after the program ends. More details to be announced.
+We hit every rewards milestone, so the full $1,000,000 pool is unlocked. To put the remaining $179,000 to use, weekly trading rewards will run for 3 additional weeks (19 weeks in total). MON rewards will be distributed within one week after the program ends. More details to be announced.
 
 ### $1,000,000 in MON incentives
 
@@ -57,7 +57,7 @@ mPoints are earned based on organic trading activity. Snapshots happen every Wed
 
 * **Total mPoints supply:** 1,000,000
 * **Weekly trading allocation:** 50,000 mPoints
-* **Other activations:** 50,000 mPoints, including the final tournament
+* **Other activations:** 50,000 mPoints
 * **Snapshots:** Every Wednesday
 * **Distribution:** Every Monday
 * **Rules:** Only organic activity counts toward mPoints
@@ -70,7 +70,7 @@ Purple Summer is a double points season for Perpl users. mPoints run alongside t
 With the campaign nearing its conclusion, $179,000 worth of mPoints remained unused in the pool. Here’s how they will be allocated:
 
 * **3 additional weeks of weekly trading rewards ($150,000):** The weekly trading rewards program continues for 3 more weeks at 50,000 mPoints ($50,000) per week, using the same mechanics as before.
-* **Final tournament ($29,000):** The remaining 29,000 mPoints ($29,000) will be distributed through a tournament running during the final weeks of the program. Full rules, eligibility, and leaderboard details will be shared separately.
+* **Final distribution ($29,000):** The remaining 29,000 mPoints ($29,000) will be distributed through a separate campaign running during the final weeks of the program. Full details will be shared separately.
 * The total mPoints supply remains 1,000,000.
 
 #### Claiming your MON
