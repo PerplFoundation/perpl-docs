@@ -2,7 +2,11 @@
 
 ## mPoints Finale Tournament
 
-There are 29,000 mPoints remaining from the mPoints campaign, which will be used to fund a trading tournament. The tournament includes two independent leaderboards.
+There are 29,000 mPoints remaining from the mPoints campaign, which will be used to fund a trading tournament.
+
+Traders will have two weeks to compete for $29,000 in cash prizes across two leaderboards.
+
+The competition runs from November 9, 16:00 UTC to November 23, 16:00 UTC.
 
 Every market is eligible.
 
