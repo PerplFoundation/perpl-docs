@@ -70,12 +70,12 @@ Purple Summer is a double points season for Perpl users. mPoints run alongside t
 With the campaign nearing its conclusion, $179,000 worth of mPoints remained unused in the pool. Here’s how they will be allocated:
 
 * **3 additional weeks of weekly trading rewards ($150,000):** The weekly trading rewards program continues for 3 more weeks at 50,000 mPoints ($50,000) per week, using the same mechanics as before.
-* **Final distribution ($29,000):** The remaining 29,000 mPoints ($29,000) will be distributed through a separate campaign running during the final weeks of the program. Full details will be shared separately.
+* **Final distribution ($29,000):** The remaining 29,000 mPoints ($29,000) will be distributed through a separate campaign running during the final weeks of the program. [tournament-3.md](tournaments/tournament-3.md "mention").
 * The total mPoints supply remains 1,000,000.
 
-#### Claiming your MON
+#### MON rewards distribution
 
-After the 19-week campaign ends, users will be able to claim their share of the MON reward pool based on their accumulated mPoints. MON rewards will be distributed within one week after the mPoints program ends. More details to be announced.
+After the 19-week campaign ends, users will receive their share of the MON reward pool based on their accumulated mPoints. MON rewards will be distributed within one week after the mPoints program ends. 1 mPoint = $1. The dollar value is fixed at the snapshot.
 
 ### Growth Mode
 
