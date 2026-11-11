@@ -59,4 +59,6 @@ Wash trading, self-dealing and volume generated between coordinated wallets are 
 
 Institutional market makers are not eligible for participation in the tournament.
 
-A deposit of $100 and a minimum of $200k trading volume is required to be eligible for a prize.
+Your account must hold at least $100 in available balance plus collateral locked in open positions to appear on the leaderboards and to be eligible for prizes.
+
+Prizes also require at least $200k trading volume.
